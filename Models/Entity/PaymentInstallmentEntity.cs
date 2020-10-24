@@ -9,14 +9,14 @@ namespace payment_api.Models
         public int PaymentId { get; set; }
 
         [Required(ErrorMessage = "RawValue is required")]
-        public float RawValue { get; set; }
+        public double RawValue { get; set; }
 
         [Required(ErrorMessage = "LiquidValue is required")]
-        public float LiquidValue { get; set; }
+        public double LiquidValue { get; set; }
 
         [Required(ErrorMessage = "InstallmentNumber is required")]
         public int InstallmentNumber { get; set; }
-        public float? AnticipatedValue { get; set; }
+        public double? AnticipatedValue { get; set; }
 
         [Required(ErrorMessage = "DueDate is required")]
         public DateTime DueDate { get; set; }

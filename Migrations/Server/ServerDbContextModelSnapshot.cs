@@ -39,16 +39,17 @@ namespace payment_api.Migrations.Server
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("CreditCard")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<float>("LiquidValue")
-                        .HasColumnType("real");
+                    b.Property<double>("LiquidValue")
+                        .HasColumnType("double precision");
 
-                    b.Property<float>("RawValue")
-                        .HasColumnType("real");
+                    b.Property<double>("RawValue")
+                        .HasColumnType("double precision");
 
-                    b.Property<float>("Tax")
-                        .HasColumnType("real");
+                    b.Property<double>("Tax")
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("timestamp without time zone");
@@ -68,8 +69,8 @@ namespace payment_api.Migrations.Server
                     b.Property<DateTime?>("AntecipatedTranfer")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<float?>("AnticipatedValue")
-                        .HasColumnType("real");
+                    b.Property<double?>("AnticipatedValue")
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("timestamp without time zone");
@@ -77,8 +78,8 @@ namespace payment_api.Migrations.Server
                     b.Property<int>("InstallmentNumber")
                         .HasColumnType("integer");
 
-                    b.Property<float>("LiquidValue")
-                        .HasColumnType("real");
+                    b.Property<double>("LiquidValue")
+                        .HasColumnType("double precision");
 
                     b.Property<int?>("PaymentEntityId")
                         .HasColumnType("integer");
@@ -86,8 +87,8 @@ namespace payment_api.Migrations.Server
                     b.Property<int>("PaymentId")
                         .HasColumnType("integer");
 
-                    b.Property<float>("RawValue")
-                        .HasColumnType("real");
+                    b.Property<double>("RawValue")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 

@@ -19,10 +19,10 @@ namespace payment_api.Migrations.Server
                     CancelDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
                     Anticipated = table.Column<bool>(type: "boolean", nullable: false),
                     Approved = table.Column<bool>(type: "boolean", nullable: false),
-                    RawValue = table.Column<float>(type: "real", nullable: false),
-                    LiquidValue = table.Column<float>(type: "real", nullable: false),
-                    Tax = table.Column<float>(type: "real", nullable: false),
-                    CreditCard = table.Column<string>(type: "text", nullable: true)
+                    RawValue = table.Column<double>(type: "double precision", nullable: false),
+                    LiquidValue = table.Column<double>(type: "double precision", nullable: false),
+                    Tax = table.Column<double>(type: "double precision", nullable: false),
+                    CreditCard = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -36,10 +36,10 @@ namespace payment_api.Migrations.Server
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PaymentId = table.Column<int>(type: "integer", nullable: false),
-                    RawValue = table.Column<float>(type: "real", nullable: false),
-                    LiquidValue = table.Column<float>(type: "real", nullable: false),
+                    RawValue = table.Column<double>(type: "double precision", nullable: false),
+                    LiquidValue = table.Column<double>(type: "double precision", nullable: false),
                     InstallmentNumber = table.Column<int>(type: "integer", nullable: false),
-                    AnticipatedValue = table.Column<float>(type: "real", nullable: true),
+                    AnticipatedValue = table.Column<double>(type: "double precision", nullable: true),
                     DueDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     AntecipatedTranfer = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
                     PaymentEntityId = table.Column<int>(type: "integer", nullable: true)

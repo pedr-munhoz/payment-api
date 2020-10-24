@@ -20,13 +20,13 @@ namespace payment_api.Models
         public bool Approved { get; set; }
 
         [Required(ErrorMessage = "RawValue is required")]
-        public float RawValue { get; set; }
+        public double RawValue { get; set; }
 
         [Required(ErrorMessage = "LiquidValue is required")]
-        public float LiquidValue { get; set; }
+        public double LiquidValue { get; set; }
 
         [Required(ErrorMessage = "Tax is required")]
-        public float Tax { get; set; }
+        public double Tax { get; set; }
 
         [Required(ErrorMessage = "PaymentInstallments is required")]
         public List<PaymentInstallmentEntity> PaymentInstallments { get; set; }
