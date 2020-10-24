@@ -43,6 +43,6 @@ namespace payment_api.Models
 
         public int PaymentInstallmentCount { get => PaymentInstallments.Count; }
 
-        public int Nfu { get => Id; }
+        public int Nsu { get => Id; }
     }
 }
