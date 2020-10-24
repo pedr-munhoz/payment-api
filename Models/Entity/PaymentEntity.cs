@@ -6,13 +6,6 @@ namespace payment_api.Models
 {
     public class PaymentEntity : DbEntity
     {
-        public PaymentEntity()
-        {
-            var installments = new List<PaymentInstallmentEntity>();
-            installments.Add(new PaymentInstallmentEntity());
-            PaymentInstallments = installments;
-        }
-
         [Required(ErrorMessage = "TransactionDate is required")]
         public DateTime TransactionDate { get; set; }
 
