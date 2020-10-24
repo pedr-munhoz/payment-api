@@ -5,8 +5,14 @@ using payment_api.Infrastructure.Database;
 
 namespace payment_api.Models.Service
 {
+    /// <summary>
+    /// Class with a PostgreSQL implementation to satisfy the <see cref="IPaymentService"/> requirements.
+    /// </summary>
     public class PaymentService : IPaymentService
     {
+        /// <summary>
+        /// PostgreSQL database context.
+        /// </summary>
         private readonly ServerDbContext _dbContext;
 
         public PaymentService(ServerDbContext dbContext)
@@ -31,7 +37,7 @@ namespace payment_api.Models.Service
         public async Task<PaymentEntity> Get(int nsu)
             => await _dbContext.Set<PaymentEntity>()
                     .AsQueryable()
-                    .Where(payment => payment.Id == nsu)
+                    .Where(payment => payment.Nsu == nsu)
                     .FirstOrDefaultAsync();
     }
 }
