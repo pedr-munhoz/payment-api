@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using payment_api.Infrastructure.Database;
+using payment_api.Models.Service;
 
 namespace payment_api
 {
@@ -25,6 +27,7 @@ namespace payment_api
 
             services.AddSingleton<ServerDbContext>(new ServerDbContext(serverDbOptions.Options));
 
+            services.TryAddSingleton<IPaymentService, PaymentService>();
 
             services.AddControllers();
         }
