@@ -5,7 +5,7 @@ namespace payment_api.Models.Service
 {
     public interface IAntecipationDbService
     {
-        Task<AntecipationEntity> Create(List<int> ids);
+        Task<AntecipationEntity> Create(AntecipationEntity entity);
 
         Task<AntecipationEntity> Update(AntecipationEntity entity);
 

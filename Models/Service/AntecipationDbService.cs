@@ -14,9 +14,13 @@ namespace payment_api.Models.Service
             _dbContext = dbContext;
         }
 
-        public Task<AntecipationEntity> Create(List<int> ids)
+        public async Task<AntecipationEntity> Create(AntecipationEntity entity)
         {
-            throw new System.NotImplementedException();
+            await _dbContext.AddAsync(entity);
+
+            await _dbContext.SaveChangesAsync();
+
+            return entity;
         }
 
         public Task<AntecipationEntity> Get(int id)
