@@ -8,5 +8,7 @@ namespace payment_api.Infrastructure.Database
         public ServerDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<PaymentEntity> Payments { get; set; }
+
+        public DbSet<AntecipationEntity> Antecipations { get; set; }
     }
 }

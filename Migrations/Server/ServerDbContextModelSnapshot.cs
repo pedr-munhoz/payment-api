@@ -19,12 +19,62 @@ namespace payment_api.Migrations.Server
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.0-rc.2.20475.6");
 
+            modelBuilder.Entity("payment_api.Models.AntecipationAnalysis", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("FinalStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AntecipationAnalysis");
+                });
+
+            modelBuilder.Entity("payment_api.Models.AntecipationEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int?>("AnalysisId")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("AntecipatedValue")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("SolicitationDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<double>("SolicitedValue")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnalysisId");
+
+                    b.ToTable("Antecipations");
+                });
+
             modelBuilder.Entity("payment_api.Models.PaymentEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
+
+                    b.Property<int?>("AntecipationEntityId")
+                        .HasColumnType("integer");
 
                     b.Property<bool?>("Anticipated")
                         .HasColumnType("boolean");
@@ -54,6 +104,8 @@ namespace payment_api.Migrations.Server
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AntecipationEntityId");
 
                     b.ToTable("Payments");
                 });
@@ -96,11 +148,32 @@ namespace payment_api.Migrations.Server
                     b.ToTable("PaymentInstallmentEntity");
                 });
 
+            modelBuilder.Entity("payment_api.Models.AntecipationEntity", b =>
+                {
+                    b.HasOne("payment_api.Models.AntecipationAnalysis", "Analysis")
+                        .WithMany()
+                        .HasForeignKey("AnalysisId");
+
+                    b.Navigation("Analysis");
+                });
+
+            modelBuilder.Entity("payment_api.Models.PaymentEntity", b =>
+                {
+                    b.HasOne("payment_api.Models.AntecipationEntity", null)
+                        .WithMany("SolicitedPayments")
+                        .HasForeignKey("AntecipationEntityId");
+                });
+
             modelBuilder.Entity("payment_api.Models.PaymentInstallmentEntity", b =>
                 {
                     b.HasOne("payment_api.Models.PaymentEntity", null)
                         .WithMany("PaymentInstallments")
                         .HasForeignKey("PaymentEntityId");
+                });
+
+            modelBuilder.Entity("payment_api.Models.AntecipationEntity", b =>
+                {
+                    b.Navigation("SolicitedPayments");
                 });
 
             modelBuilder.Entity("payment_api.Models.PaymentEntity", b =>
