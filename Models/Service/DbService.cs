@@ -7,16 +7,16 @@ using payment_api.Infrastructure.Database;
 namespace payment_api.Models.Service
 {
     /// <summary>
-    /// Class with a PostgreSQL implementation to satisfy the <see cref="IPaymentDbService"/> requirements.
+    /// Class with a PostgreSQL implementation to satisfy the <see cref="DbService"/> requirements.
     /// </summary>
-    public class PaymentDbService : IPaymentDbService
+    public class DbService : IDbService
     {
         /// <summary>
         /// PostgreSQL database context.
         /// </summary>
         private readonly ServerDbContext _dbContext;
 
-        public PaymentDbService(ServerDbContext dbContext)
+        public DbService(ServerDbContext dbContext)
         {
             _dbContext = dbContext;
         }

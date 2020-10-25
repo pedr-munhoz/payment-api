@@ -7,10 +7,10 @@ namespace payment_api.Models.Service
     public class PaymentProcessService : IPaymentProcessService
     {
         private const double FixTax = 0.90;
-        private readonly IPaymentDbService _dbService;
+        private readonly IDbService _dbService;
         private readonly IValidationService _validationService;
 
-        public PaymentProcessService(IPaymentDbService dbService, IValidationService validationService)
+        public PaymentProcessService(IDbService dbService, IValidationService validationService)
         {
             _dbService = dbService;
             _validationService = validationService;

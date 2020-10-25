@@ -7,7 +7,7 @@ namespace payment_api.Models.Service
     /// Service signature for dealing with data from the db.
     /// Supports any database implementation underneath.
     /// </summary>
-    public interface IPaymentDbService
+    public interface IDbService
     {
         Task<PaymentEntity> Get(int nsu);
 
