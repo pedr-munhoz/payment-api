@@ -11,6 +11,6 @@ namespace payment_api.Models.Service
     {
         Task<PaymentEntity> Get(int nsu);
 
-        Task<EntityCreationResult<PaymentEntity>> Create(PaymentEntity entity);
+        Task<PaymentEntity> Create(PaymentEntity entity);
     }
 }

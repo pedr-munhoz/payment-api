@@ -8,10 +8,12 @@ namespace payment_api.Models.Service
     {
         private const double FixTax = 0.90;
         private readonly IPaymentDbService _dbService;
+        private readonly IValidationService _validationService;
 
-        public PaymentProcessService(IPaymentDbService dbService)
+        public PaymentProcessService(IPaymentDbService dbService, IValidationService validationService)
         {
             _dbService = dbService;
+            _validationService = validationService;
         }
 
         public async Task<PaymentProcessResult> ProcessPayment(PaymentRequest request, DateTime transactionDate)
@@ -29,13 +31,12 @@ namespace payment_api.Models.Service
                     CreditCard = request.CreditCard.Substring(12),
                 };
 
-                return new PaymentProcessResult(rejectedPayment, false);
+                return _validationService.Validate(rejectedPayment, false);
             }
 
             var payment = new PaymentEntity
             {
                 TransactionDate = transactionDate,
-                Anticipated = false,
                 Approved = true,
                 RawValue = request.RawValue,
                 LiquidValue = request.RawValue - FixTax,
@@ -54,17 +55,19 @@ namespace payment_api.Models.Service
                 });
             }
 
-            var result = await _dbService.Create(payment);
+            var result = _validationService.Validate(payment, true);
 
-            if (!result.Success)
-                return new PaymentProcessResult(result, false);
+            await _dbService.Create(payment);
 
-            foreach (var installment in result.Value.PaymentInstallments)
+            if (!result.CreationResult.Success)
+                return result;
+
+            foreach (var installment in result.CreationResult.Value.PaymentInstallments)
             {
-                installment.PaymentId = result.Value.Id;
+                installment.PaymentId = result.CreationResult.Value.Id;
             }
 
-            return new PaymentProcessResult(result, true);
+            return result;
         }
     }
 }

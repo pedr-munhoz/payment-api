@@ -31,6 +31,8 @@ namespace payment_api
 
             services.TryAddSingleton<IPaymentProcessService, PaymentProcessService>();
 
+            services.TryAddSingleton<IValidationService, ValidationService>();
+
             services.AddControllers();
         }
 

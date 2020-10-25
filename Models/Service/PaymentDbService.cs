@@ -20,18 +20,13 @@ namespace payment_api.Models.Service
             _dbContext = dbContext;
         }
 
-        public async Task<EntityCreationResult<PaymentEntity>> Create(PaymentEntity entity)
+        public async Task<PaymentEntity> Create(PaymentEntity entity)
         {
-            var result = new EntityCreationResult<PaymentEntity>(entity);
-
-            if (!result.Success)
-                return result;
-
-            await _dbContext.AddAsync(result.Value);
+            await _dbContext.AddAsync(entity);
 
             await _dbContext.SaveChangesAsync();
 
-            return result;
+            return entity;
         }
 
         public async Task<PaymentEntity> Get(int nsu)
