@@ -50,7 +50,7 @@ namespace payment_api.Migrations.Server
                     b.Property<int?>("AnalysisId")
                         .HasColumnType("integer");
 
-                    b.Property<double>("AntecipatedValue")
+                    b.Property<double?>("AntecipatedValue")
                         .HasColumnType("double precision");
 
                     b.Property<DateTime>("SolicitationDate")

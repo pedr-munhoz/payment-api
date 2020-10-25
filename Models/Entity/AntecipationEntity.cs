@@ -11,8 +11,8 @@ namespace payment_api.Models
 
         public double SolicitedValue { get; set; }
 
-        public double AntecipatedValue { get; set; }
+        public double? AntecipatedValue { get; set; }
 
-        public HashSet<PaymentEntity> SolicitedPayments { get; set; }
+        public HashSet<PaymentEntity> SolicitedPayments { get; set; } = new HashSet<PaymentEntity>();
     }
 }

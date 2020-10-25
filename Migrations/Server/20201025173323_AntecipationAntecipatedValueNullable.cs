@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace payment_api.Migrations.Server
 {
-    public partial class IncludeAntecipation : Migration
+    public partial class AntecipationAntecipatedValueNullable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,7 +32,7 @@ namespace payment_api.Migrations.Server
                     SolicitationDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     AnalysisId = table.Column<int>(type: "integer", nullable: true),
                     SolicitedValue = table.Column<double>(type: "double precision", nullable: false),
-                    AntecipatedValue = table.Column<double>(type: "double precision", nullable: false)
+                    AntecipatedValue = table.Column<double>(type: "double precision", nullable: true)
                 },
                 constraints: table =>
                 {

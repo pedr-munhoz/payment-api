@@ -7,10 +7,12 @@ namespace payment_api.Controllers
     public class AntecipationController : BaseController
     {
         private readonly IPaymentDbService _paymentDbService;
+        private readonly IAntecipationDbService _antecipationDbService;
 
-        public AntecipationController(IPaymentDbService paymentDbService)
+        public AntecipationController(IPaymentDbService paymentDbService, IAntecipationDbService antecipationDbService)
         {
             _paymentDbService = paymentDbService;
+            _antecipationDbService = antecipationDbService;
         }
 
         [HttpGet("avaliable")]
@@ -18,6 +20,13 @@ namespace payment_api.Controllers
         {
             var avaliablePayments = await _paymentDbService.GetAvailablePayments();
             return Ok(avaliablePayments);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Get(string status)
+        {
+            var antecipations = await _antecipationDbService.Get();
+            return Ok(antecipations);
         }
     }
 }

@@ -10,8 +10,8 @@ using payment_api.Infrastructure.Database;
 namespace payment_api.Migrations.Server
 {
     [DbContext(typeof(ServerDbContext))]
-    [Migration("20201025165852_IncludeAntecipation")]
-    partial class IncludeAntecipation
+    [Migration("20201025173323_AntecipationAntecipatedValueNullable")]
+    partial class AntecipationAntecipatedValueNullable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -52,7 +52,7 @@ namespace payment_api.Migrations.Server
                     b.Property<int?>("AnalysisId")
                         .HasColumnType("integer");
 
-                    b.Property<double>("AntecipatedValue")
+                    b.Property<double?>("AntecipatedValue")
                         .HasColumnType("double precision");
 
                     b.Property<DateTime>("SolicitationDate")
