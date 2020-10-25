@@ -37,7 +37,7 @@ namespace payment_api.Models.Service
         public async Task<PaymentEntity> Get(int nsu)
             => await _dbContext.Set<PaymentEntity>()
                     .AsQueryable()
-                    .Where(payment => payment.Nsu == nsu)
+                    .Where(payment => payment.Id == nsu)
                     .FirstOrDefaultAsync();
     }
 }

@@ -10,7 +10,7 @@ using payment_api.Infrastructure.Database;
 namespace payment_api.Migrations.Server
 {
     [DbContext(typeof(ServerDbContext))]
-    [Migration("20201024225015_InitialCreate")]
+    [Migration("20201025004726_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

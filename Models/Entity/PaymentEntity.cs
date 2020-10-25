@@ -29,7 +29,7 @@ namespace payment_api.Models
         public double Tax { get; set; }
 
         [Required(ErrorMessage = "PaymentInstallments is required")]
-        public List<PaymentInstallmentEntity> PaymentInstallments { get; set; }
+        public HashSet<PaymentInstallmentEntity> PaymentInstallments { get; set; } = new HashSet<PaymentInstallmentEntity>();
 
         [Required(ErrorMessage = "CreditCard is required")]
         public string CreditCard { get; set; }

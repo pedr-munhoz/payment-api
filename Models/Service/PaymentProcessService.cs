@@ -27,7 +27,6 @@ namespace payment_api.Models.Service
                     LiquidValue = request.RawValue - FixTax,
                     Tax = FixTax,
                     CreditCard = request.CreditCard.Substring(12),
-                    PaymentInstallments = new List<PaymentInstallmentEntity>()
                 };
 
                 return new PaymentProcessResult(rejectedPayment, false);
@@ -44,10 +43,9 @@ namespace payment_api.Models.Service
                 CreditCard = request.CreditCard.Substring(12)
             };
 
-            var installments = new List<PaymentInstallmentEntity>();
             for (int i = 1; i <= request.PaymentInstallmentCount; i++)
             {
-                installments.Add(new PaymentInstallmentEntity
+                payment.PaymentInstallments.Add(new PaymentInstallmentEntity
                 {
                     RawValue = request.RawValue / request.PaymentInstallmentCount,
                     LiquidValue = payment.LiquidValue / request.PaymentInstallmentCount,
@@ -55,7 +53,6 @@ namespace payment_api.Models.Service
                     DueDate = transactionDate.AddDays(i * 30),
                 });
             }
-            payment.PaymentInstallments = installments;
 
             var result = await _dbService.Create(payment);
 
