@@ -27,7 +27,7 @@ namespace payment_api
 
             services.AddSingleton<ServerDbContext>(new ServerDbContext(serverDbOptions.Options));
 
-            services.TryAddSingleton<IDbService, DbService>();
+            services.TryAddSingleton<IPaymentDbService, PaymentDbService>();
 
             services.TryAddSingleton<IPaymentProcessService, PaymentProcessService>();
 

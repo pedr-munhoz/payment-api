@@ -6,9 +6,9 @@ namespace payment_api.Controllers
 {
     public class AntecipationController : BaseController
     {
-        private readonly IDbService _paymentDbService;
+        private readonly IPaymentDbService _paymentDbService;
 
-        public AntecipationController(IDbService paymentDbService)
+        public AntecipationController(IPaymentDbService paymentDbService)
         {
             _paymentDbService = paymentDbService;
         }

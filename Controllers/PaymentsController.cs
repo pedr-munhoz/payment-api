@@ -9,11 +9,11 @@ namespace payment_api.Controllers
 {
     public class PaymentsController : BaseController
     {
-        private readonly IDbService _paymentService;
+        private readonly IPaymentDbService _paymentService;
 
         private readonly IPaymentProcessService _paymentProcessService;
 
-        public PaymentsController(IDbService paymentService, IPaymentProcessService paymentProcessService)
+        public PaymentsController(IPaymentDbService paymentService, IPaymentProcessService paymentProcessService)
         {
             _paymentService = paymentService;
             _paymentProcessService = paymentProcessService;
