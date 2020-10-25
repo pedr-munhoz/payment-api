@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -34,5 +35,11 @@ namespace payment_api.Models.Service
                     .AsQueryable()
                     .Where(payment => payment.Id == nsu)
                     .FirstOrDefaultAsync();
+
+        public async Task<List<PaymentEntity>> GetAvailablePayments()
+            => await _dbContext.Set<PaymentEntity>()
+                    .AsQueryable()
+                    .Where(payment => payment.Anticipated == null)
+                    .ToListAsync();
     }
 }

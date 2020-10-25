@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace payment_api.Migrations.Server
 {
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,12 +17,12 @@ namespace payment_api.Migrations.Server
                     TransactionDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     AprovalDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
                     CancelDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    Anticipated = table.Column<bool>(type: "boolean", nullable: false),
+                    Anticipated = table.Column<bool>(type: "boolean", nullable: true),
                     Approved = table.Column<bool>(type: "boolean", nullable: false),
                     RawValue = table.Column<double>(type: "double precision", nullable: false),
                     LiquidValue = table.Column<double>(type: "double precision", nullable: false),
                     Tax = table.Column<double>(type: "double precision", nullable: false),
-                    CreditCard = table.Column<string>(type: "text", nullable: false)
+                    CreditCard = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

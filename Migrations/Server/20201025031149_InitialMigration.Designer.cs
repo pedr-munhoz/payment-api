@@ -10,8 +10,8 @@ using payment_api.Infrastructure.Database;
 namespace payment_api.Migrations.Server
 {
     [DbContext(typeof(ServerDbContext))]
-    [Migration("20201025024007_PaymentAntecipadIsNullable")]
-    partial class PaymentAntecipadIsNullable
+    [Migration("20201025031149_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

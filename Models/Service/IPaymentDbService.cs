@@ -12,5 +12,7 @@ namespace payment_api.Models.Service
         Task<PaymentEntity> Get(int nsu);
 
         Task<PaymentEntity> Create(PaymentEntity entity);
+
+        Task<List<PaymentEntity>> GetAvailablePayments();
     }
 }
