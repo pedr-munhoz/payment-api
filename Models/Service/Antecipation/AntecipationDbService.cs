@@ -86,9 +86,16 @@ namespace payment_api.Models.Service
                                     .Where(antecipation => antecipation.Id == id)
                                     .FirstOrDefaultAsync();
 
+            if (entity == null)
+                return entity;
+
             entity.SolicitedPayments = await _dbContext.Set<PaymentEntity>()
                                                 .Where(x => x.SolicitationId == id)
                                                 .ToListAsync();
+
+            entity.Analysis = await _dbContext.Set<AntecipationAnalysis>()
+                                            .Where(x => x.AntecipationId == entity.Id)
+                                                  .FirstOrDefaultAsync();
 
             return entity;
         }
@@ -142,6 +149,10 @@ namespace payment_api.Models.Service
                 entity.SolicitedPayments = await _dbContext.Set<PaymentEntity>()
                                                 .Where(x => x.SolicitationId == entity.Id)
                                                 .ToListAsync();
+
+                entity.Analysis = await _dbContext.Set<AntecipationAnalysis>()
+                                            .Where(x => x.AntecipationId == entity.Id)
+                                                  .FirstOrDefaultAsync();
             }
             return antecipations;
         }
@@ -169,9 +180,12 @@ namespace payment_api.Models.Service
             return new SolicitationProcessResult(entity);
         }
 
-        public async Task<AntecipationEntity> ResolvePaymentAntecipation(int antecipationId, List<int> paymentIds, bool approve)
+        public async Task<SolicitationProcessResult> ResolvePaymentAntecipation(int antecipationId, List<int> paymentIds, bool approve)
         {
             var entity = await Get(antecipationId);
+
+            if (entity == null)
+                return new SolicitationProcessResult($"No antecipation request found for id = {antecipationId}.");
 
             var payments = entity.SolicitedPayments.AsQueryable()
                                         .Where(payment => paymentIds.Contains(payment.Id));
@@ -255,7 +269,7 @@ namespace payment_api.Models.Service
                 await _dbContext.SaveChangesAsync();
             }
 
-            return entity;
+            return new SolicitationProcessResult(entity);
         }
     }
 }

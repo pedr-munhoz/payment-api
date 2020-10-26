@@ -55,12 +55,26 @@ namespace payment_api.Controllers
             return Ok(result);
         }
 
-        [HttpPatch("resolve-analysis")]
-        public async Task<ActionResult> ResolvePaymentAntecipation([FromQuery] int id, bool approve, [FromBody] List<int> paymentIds)
+        [HttpPatch("{id:int}/approve")]
+        public async Task<ActionResult> ApprovePaymentAntecipation(int id, [FromBody] List<int> paymentIds)
         {
-            var result = await _antecipationDbService.ResolvePaymentAntecipation(id, paymentIds, approve);
+            var result = await _antecipationDbService.ResolvePaymentAntecipation(id, paymentIds, true);
 
-            return Ok(result);
+            if (!result.Success)
+                return NotFound(result.ErrorMessage);
+
+            return Ok(result.Value);
+        }
+
+        [HttpPatch("{id:int}/reject")]
+        public async Task<ActionResult> RejectPaymentAntecipation(int id, [FromBody] List<int> paymentIds)
+        {
+            var result = await _antecipationDbService.ResolvePaymentAntecipation(id, paymentIds, false);
+
+            if (!result.Success)
+                return NotFound(result.ErrorMessage);
+
+            return Ok(result.Value);
         }
     }
 }
