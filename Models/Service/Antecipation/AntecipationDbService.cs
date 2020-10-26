@@ -45,24 +45,20 @@ namespace payment_api.Models.Service
             await _dbContext.SaveChangesAsync();
 
 
-
             // sets the payment.solicitationId fields to the current antecipation id
             // needs to be done after the SaveChangesAsync so the id is set.
-            foreach (var paymentId in paymentIds)
-            {
-                var payment = await _dbContext.Set<PaymentEntity>()
-                                            .Where(x => x.Id == paymentId)
-                                            .FirstOrDefaultAsync();
+            var payments = await _dbContext.Set<PaymentEntity>()
+                                    .Where(x => paymentIds.Contains(x.Id) && x.SolicitationId == null)
+                                    .ToListAsync();
 
-                if (payment != null)
-                {
-                    if (payment.SolicitationId == null)
-                    {
-                        payment.SolicitationId = entity.Id;
-                        entity.SolicitedValue += payment.LiquidValue * TaxRate;
-                        entity.SolicitedPayments.Add(payment);
-                    }
-                }
+            if (payments.Count() == 0)
+                return new SolicitationProcessResult("None of the solicited payments are available for anticipation.");
+
+            foreach (var payment in payments)
+            {
+                payment.SolicitationId = entity.Id;
+                entity.SolicitedValue += payment.LiquidValue * TaxRate;
+                entity.SolicitedPayments.Add(payment);
             }
 
             var analysis = new AntecipationAnalysis
