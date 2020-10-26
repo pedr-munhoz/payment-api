@@ -33,16 +33,10 @@ namespace payment_api.Controllers
         {
             var result = await _paymentProcessService.ProcessPayment(paymentRequest, DateTime.Now);
 
-            if (!result.CreationResult.Success)
-                return BadRequest();
-
-            if (!result.Approved)
+            if (!result.Success)
                 return UnprocessableEntity("CreditCard denied");
 
-            return Created(
-                $"/{result.CreationResult.Value.Id}",
-                result.CreationResult.Value
-            );
+            return Created($"/{result.Value.Id}", result.Value);
         }
     }
 }

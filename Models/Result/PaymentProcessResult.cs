@@ -1,20 +1,20 @@
-namespace payment_api.Models
+namespace payment_api.Models.Result
 {
-    public class PaymentProcessResult
+    public class PaymentProcessResult : IResult<PaymentEntity>
     {
-        public PaymentProcessResult(PaymentEntity value, bool approved)
+        public PaymentProcessResult(PaymentEntity value, bool success)
         {
-            CreationResult = new EntityCreationResult<PaymentEntity>(value);
-            Approved = approved;
+            Value = value;
+            Success = success;
         }
 
-        public PaymentProcessResult(EntityCreationResult<PaymentEntity> result, bool approved)
+        public PaymentProcessResult(bool success)
         {
-            CreationResult = result;
-            Approved = approved;
+            Success = success;
         }
 
-        public EntityCreationResult<PaymentEntity> CreationResult { get; set; }
-        public bool Approved { get; set; }
+        public PaymentEntity Value { get; set; }
+
+        public bool Success { get; set; }
     }
 }

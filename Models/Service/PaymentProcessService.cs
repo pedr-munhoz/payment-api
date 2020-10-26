@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using payment_api.Models.Result;
 
 namespace payment_api.Models.Service
 {
@@ -8,14 +9,14 @@ namespace payment_api.Models.Service
     {
         private const double FixTax = 0.90;
         private readonly IPaymentDbService _paymentDbService;
-        private readonly IValidationService _validationService;
+        private readonly IResultService _resultService;
 
         private readonly IPaymentInstallmentDbService _paymentInstallmentDbService;
 
-        public PaymentProcessService(IPaymentDbService paymentDbService, IValidationService validationService, IPaymentInstallmentDbService paymentInstallmentDbService)
+        public PaymentProcessService(IPaymentDbService paymentDbService, IResultService resultService, IPaymentInstallmentDbService paymentInstallmentDbService)
         {
             _paymentDbService = paymentDbService;
-            _validationService = validationService;
+            _resultService = resultService;
             _paymentInstallmentDbService = paymentInstallmentDbService;
         }
 
@@ -23,19 +24,7 @@ namespace payment_api.Models.Service
         {
             if (request.CreditCard.Substring(0, 4) == "5999")
             {
-                var rejectedPayment = new PaymentEntity
-                {
-                    Approved = false,
-                    TransactionDate = transactionDate,
-                    Anticipated = false,
-                    RawValue = request.RawValue,
-                    LiquidValue = request.RawValue - FixTax,
-                    Tax = FixTax,
-                    CreditCard = request.CreditCard.Substring(12),
-                    PaymentInstallmentCount = request.PaymentInstallmentCount
-                };
-
-                return _validationService.Validate(rejectedPayment, false);
+                return _resultService.GenerateFailedResult();
             }
 
             var payment = new PaymentEntity
@@ -45,7 +34,8 @@ namespace payment_api.Models.Service
                 RawValue = request.RawValue,
                 LiquidValue = request.RawValue - FixTax,
                 Tax = FixTax,
-                CreditCard = request.CreditCard.Substring(12)
+                CreditCard = request.CreditCard.Substring(12),
+                PaymentInstallmentCount = request.PaymentInstallmentCount
             };
 
             await _paymentDbService.Create(payment);
@@ -64,10 +54,7 @@ namespace payment_api.Models.Service
 
             var entity = await _paymentDbService.Get(payment.Id);
 
-            var result = _validationService.Validate(entity, true);
-
-            if (!result.CreationResult.Success)
-                return result;
+            var result = _resultService.GenerateResult(entity, true);
 
             return result;
         }

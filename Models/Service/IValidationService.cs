@@ -1,8 +1,11 @@
+using payment_api.Models.Result;
+
 namespace payment_api.Models.Service
 {
-    public interface IValidationService
+    public interface IResultService
     {
-        PaymentProcessResult Validate(EntityCreationResult<PaymentEntity> result, bool approved);
-        PaymentProcessResult Validate(PaymentEntity payment, bool approved);
+        PaymentProcessResult GenerateResult(PaymentEntity payment, bool approved);
+
+        PaymentProcessResult GenerateFailedResult();
     }
 }
