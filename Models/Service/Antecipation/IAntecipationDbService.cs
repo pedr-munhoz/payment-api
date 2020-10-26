@@ -9,7 +9,7 @@ namespace payment_api.Models.Service
     {
         Task<SolicitationProcessResult> Create(List<int> paymentIds, DateTime solicitationDate);
 
-        Task<AntecipationEntity> StartAnalysis(int id, DateTime startDate);
+        Task<SolicitationProcessResult> StartAnalysis(int id, DateTime startDate);
 
         Task<AntecipationEntity> Get(int id);
 

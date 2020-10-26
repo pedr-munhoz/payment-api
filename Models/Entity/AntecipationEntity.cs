@@ -8,6 +8,7 @@ namespace payment_api.Models
     {
         public DateTime SolicitationDate { get; set; }
 
+        [NotMapped]
         public AntecipationAnalysis Analysis { get; set; }
 
         public double SolicitedValue { get; set; }

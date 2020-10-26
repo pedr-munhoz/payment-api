@@ -12,5 +12,7 @@ namespace payment_api.Infrastructure.Database
         public DbSet<PaymentInstallmentEntity> Installments { get; set; }
 
         public DbSet<AntecipationEntity> Antecipations { get; set; }
+
+        public DbSet<AntecipationAnalysis> AntecipationAnalyses { get; set; }
     }
 }

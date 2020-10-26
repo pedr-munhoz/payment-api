@@ -8,6 +8,8 @@ namespace payment_api.Models
 
         public DateTime? EndDate { get; set; }
 
-        public AnalysisResultStatus? FinalStatus { get; set; }
+        public string FinalStatus { get; set; }
+
+        public int AntecipationId { get; set; }
     }
 }
