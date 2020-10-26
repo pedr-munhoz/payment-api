@@ -22,6 +22,7 @@ namespace payment_api.Models.Service
 
         public async Task<SolicitationProcessResult> Create(List<int> paymentIds, DateTime solicitationDate)
         {
+            // Check if there's a open solicitation
             var openSolicitations = await Get("pending");
             if (openSolicitations.Count != 0)
             {
@@ -33,6 +34,8 @@ namespace payment_api.Models.Service
             {
                 return new SolicitationProcessResult("Cannot open solicitation without finilizing the current one.");
             }
+
+
 
             var entity = new AntecipationEntity
             {
@@ -53,9 +56,12 @@ namespace payment_api.Models.Service
 
                 if (payment != null)
                 {
-                    payment.SolicitationId = entity.Id;
-                    entity.SolicitedValue += payment.LiquidValue * 0.962;
-                    entity.SolicitedPayments.Add(payment);
+                    if (payment.SolicitationId != null)
+                    {
+                        payment.SolicitationId = entity.Id;
+                        entity.SolicitedValue += payment.LiquidValue * 0.962;
+                        entity.SolicitedPayments.Add(payment);
+                    }
                 }
             }
 
