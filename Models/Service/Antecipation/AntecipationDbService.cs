@@ -178,23 +178,82 @@ namespace payment_api.Models.Service
 
             foreach (var payment in payments)
             {
-                payment.Anticipated = approve;
-                var installments = await _dbContext.Set<PaymentInstallmentEntity>()
-                                            .Where(x => x.PaymentId == payment.Id)
-                                            .ToListAsync();
-
-                payment.PaymentInstallments.AddRange(installments);
-
-                if (approve)
+                if (payment.Anticipated == null)
                 {
-                    foreach (var installment in installments)
+                    payment.Anticipated = approve;
+                    var installments = await _dbContext.Set<PaymentInstallmentEntity>()
+                                                .Where(x => x.PaymentId == payment.Id)
+                                                .ToListAsync();
+
+                    payment.PaymentInstallments.AddRange(installments);
+
+                    if (approve)
                     {
-                        installment.AnticipatedValue = installment.LiquidValue * TaxRate;
+                        foreach (var installment in installments)
+                        {
+                            installment.AnticipatedValue = installment.LiquidValue * TaxRate;
+                        }
                     }
                 }
             }
 
             await _dbContext.SaveChangesAsync();
+
+            var pendingPayments = await _dbContext.Set<PaymentEntity>()
+                                        .Where(payment => payment.SolicitationId == antecipationId && payment.Anticipated == null)
+                                        .ToListAsync();
+
+            // Check if all payments in this solicitation were evaluated.
+            if (pendingPayments.Count() == 0)
+            {
+                var deniedTrigger = false;
+                var acceptedTrigger = false;
+                entity.AntecipatedValue = 0;
+                foreach (var payment in entity.SolicitedPayments)
+                {
+                    if (payment.Anticipated == true)
+                    {
+                        acceptedTrigger = true;
+
+                        var installments = await _dbContext.Set<PaymentInstallmentEntity>()
+                                           .Where(x => x.PaymentId == payment.Id)
+                                           .ToListAsync();
+
+                        foreach (var installment in installments)
+                        {
+                            installment.AntecipatedTranfer = DateTime.Now;
+                            installment.AnticipatedValue = installment.LiquidValue * TaxRate;
+                            entity.AntecipatedValue += installment.LiquidValue * TaxRate;
+                        }
+
+                        payment.PaymentInstallments = installments;
+                    }
+                    else
+                    {
+                        deniedTrigger = true;
+                    }
+                }
+
+                var analysis = await _dbContext.Set<AntecipationAnalysis>()
+                                    .Where(x => x.AntecipationId == antecipationId)
+                                    .FirstOrDefaultAsync();
+
+                entity.Analysis = analysis;
+
+                analysis.EndDate = DateTime.Now;
+
+                if (deniedTrigger && !acceptedTrigger)
+                    analysis.FinalStatus = "denied";
+
+                else if (deniedTrigger && acceptedTrigger)
+                    analysis.FinalStatus = "partially approved";
+
+                else
+                    analysis.FinalStatus = "approved";
+
+
+                await _dbContext.SaveChangesAsync();
+            }
 
             return entity;
         }
