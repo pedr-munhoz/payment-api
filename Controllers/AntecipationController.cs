@@ -44,7 +44,7 @@ namespace payment_api.Controllers
             if (!result.Success)
                 return UnprocessableEntity(result.ErrorMessage);
 
-            return Created("", result.Value);
+            return Created($"/{result.Value.Id}", result.Value);
         }
 
         [HttpPatch("start-analysis/{id:int}")]

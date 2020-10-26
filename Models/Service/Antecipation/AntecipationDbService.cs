@@ -32,6 +32,13 @@ namespace payment_api.Models.Service
                 return new SolicitationProcessResult("Cannot open solicitation without finilizing the current one.");
             }
 
+            var payments = await _dbContext.Set<PaymentEntity>()
+                                    .Where(x => paymentIds.Contains(x.Id) && x.SolicitationId == null)
+                                    .ToListAsync();
+
+            if (payments.Count() == 0)
+                return new SolicitationProcessResult("None of the solicited payments are available for anticipation.");
+
 
 
             var entity = new AntecipationEntity
@@ -45,15 +52,9 @@ namespace payment_api.Models.Service
             await _dbContext.SaveChangesAsync();
 
 
+
             // sets the payment.solicitationId fields to the current antecipation id
             // needs to be done after the SaveChangesAsync so the id is set.
-            var payments = await _dbContext.Set<PaymentEntity>()
-                                    .Where(x => paymentIds.Contains(x.Id) && x.SolicitationId == null)
-                                    .ToListAsync();
-
-            if (payments.Count() == 0)
-                return new SolicitationProcessResult("None of the solicited payments are available for anticipation.");
-
             foreach (var payment in payments)
             {
                 payment.SolicitationId = entity.Id;
