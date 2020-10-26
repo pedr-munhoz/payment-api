@@ -184,6 +184,9 @@ namespace payment_api.Models.Service
             if (entity == null)
                 return new SolicitationProcessResult($"No antecipation request found for id = {antecipationId}.");
 
+            if (entity.Analysis.StartDate == null)
+                await StartAnalysis(antecipationId, DateTime.Now);
+
             var payments = entity.SolicitedPayments.AsQueryable()
                                         .Where(payment => paymentIds.Contains(payment.Id));
 
