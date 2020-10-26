@@ -46,7 +46,7 @@ namespace payment_api.Models.Service
         public async Task<List<PaymentEntity>> GetAvailablePayments()
         {
             var entities = await _dbContext.Set<PaymentEntity>()
-                    .Where(payment => payment.Anticipated == null)
+                    .Where(payment => payment.Anticipated == null && payment.Approved)
                     .ToListAsync();
 
             foreach (var entity in entities)
