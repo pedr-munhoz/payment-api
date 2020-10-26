@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace payment_api.Models
 {
@@ -13,6 +14,7 @@ namespace payment_api.Models
 
         public double? AntecipatedValue { get; set; }
 
+        [NotMapped]
         public HashSet<PaymentEntity> SolicitedPayments { get; set; } = new HashSet<PaymentEntity>();
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace payment_api.Models
 {
@@ -22,12 +23,16 @@ namespace payment_api.Models
 
         public double Tax { get; set; }
 
-        public HashSet<PaymentInstallmentEntity> PaymentInstallments { get; set; } = new HashSet<PaymentInstallmentEntity>();
+        [NotMapped]
+        public List<PaymentInstallmentEntity> PaymentInstallments { get; set; } = new List<PaymentInstallmentEntity>();
 
         public string CreditCard { get; set; }
 
-        public int PaymentInstallmentCount { get => PaymentInstallments.Count; }
+        public int PaymentInstallmentCount { get; set; }
 
+        [NotMapped]
         public int Nsu { get => Id; }
+
+        public int? SolicitationId { get; set; }
     }
 }

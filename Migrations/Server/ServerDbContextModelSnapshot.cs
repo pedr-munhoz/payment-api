@@ -73,9 +73,6 @@ namespace payment_api.Migrations.Server
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<int?>("AntecipationEntityId")
-                        .HasColumnType("integer");
-
                     b.Property<bool?>("Anticipated")
                         .HasColumnType("boolean");
 
@@ -94,8 +91,14 @@ namespace payment_api.Migrations.Server
                     b.Property<double>("LiquidValue")
                         .HasColumnType("double precision");
 
+                    b.Property<int>("PaymentInstallmentCount")
+                        .HasColumnType("integer");
+
                     b.Property<double>("RawValue")
                         .HasColumnType("double precision");
+
+                    b.Property<int?>("SolicitationId")
+                        .HasColumnType("integer");
 
                     b.Property<double>("Tax")
                         .HasColumnType("double precision");
@@ -104,8 +107,6 @@ namespace payment_api.Migrations.Server
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AntecipationEntityId");
 
                     b.ToTable("Payments");
                 });
@@ -132,9 +133,6 @@ namespace payment_api.Migrations.Server
                     b.Property<double>("LiquidValue")
                         .HasColumnType("double precision");
 
-                    b.Property<int?>("PaymentEntityId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("PaymentId")
                         .HasColumnType("integer");
 
@@ -143,9 +141,7 @@ namespace payment_api.Migrations.Server
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PaymentEntityId");
-
-                    b.ToTable("PaymentInstallmentEntity");
+                    b.ToTable("Installments");
                 });
 
             modelBuilder.Entity("payment_api.Models.AntecipationEntity", b =>
@@ -155,30 +151,6 @@ namespace payment_api.Migrations.Server
                         .HasForeignKey("AnalysisId");
 
                     b.Navigation("Analysis");
-                });
-
-            modelBuilder.Entity("payment_api.Models.PaymentEntity", b =>
-                {
-                    b.HasOne("payment_api.Models.AntecipationEntity", null)
-                        .WithMany("SolicitedPayments")
-                        .HasForeignKey("AntecipationEntityId");
-                });
-
-            modelBuilder.Entity("payment_api.Models.PaymentInstallmentEntity", b =>
-                {
-                    b.HasOne("payment_api.Models.PaymentEntity", null)
-                        .WithMany("PaymentInstallments")
-                        .HasForeignKey("PaymentEntityId");
-                });
-
-            modelBuilder.Entity("payment_api.Models.AntecipationEntity", b =>
-                {
-                    b.Navigation("SolicitedPayments");
-                });
-
-            modelBuilder.Entity("payment_api.Models.PaymentEntity", b =>
-                {
-                    b.Navigation("PaymentInstallments");
                 });
 #pragma warning restore 612, 618
         }

@@ -7,13 +7,16 @@ namespace payment_api.Models.Service
     public class PaymentProcessService : IPaymentProcessService
     {
         private const double FixTax = 0.90;
-        private readonly IPaymentDbService _dbService;
+        private readonly IPaymentDbService _paymentDbService;
         private readonly IValidationService _validationService;
 
-        public PaymentProcessService(IPaymentDbService dbService, IValidationService validationService)
+        private readonly IPaymentInstallmentDbService _paymentInstallmentDbService;
+
+        public PaymentProcessService(IPaymentDbService paymentDbService, IValidationService validationService, IPaymentInstallmentDbService paymentInstallmentDbService)
         {
-            _dbService = dbService;
+            _paymentDbService = paymentDbService;
             _validationService = validationService;
+            _paymentInstallmentDbService = paymentInstallmentDbService;
         }
 
         public async Task<PaymentProcessResult> ProcessPayment(PaymentRequest request, DateTime transactionDate)
@@ -29,6 +32,7 @@ namespace payment_api.Models.Service
                     LiquidValue = request.RawValue - FixTax,
                     Tax = FixTax,
                     CreditCard = request.CreditCard.Substring(12),
+                    PaymentInstallmentCount = request.PaymentInstallmentCount
                 };
 
                 return _validationService.Validate(rejectedPayment, false);
@@ -44,10 +48,13 @@ namespace payment_api.Models.Service
                 CreditCard = request.CreditCard.Substring(12)
             };
 
+            await _paymentDbService.Create(payment);
+
             for (int i = 1; i <= request.PaymentInstallmentCount; i++)
             {
-                payment.PaymentInstallments.Add(new PaymentInstallmentEntity
+                await _paymentInstallmentDbService.Create(new PaymentInstallmentEntity
                 {
+                    PaymentId = payment.Id,
                     RawValue = request.RawValue / request.PaymentInstallmentCount,
                     LiquidValue = payment.LiquidValue / request.PaymentInstallmentCount,
                     InstallmentNumber = i,
@@ -55,17 +62,12 @@ namespace payment_api.Models.Service
                 });
             }
 
-            var result = _validationService.Validate(payment, true);
+            var entity = await _paymentDbService.Get(payment.Id);
 
-            await _dbService.Create(payment);
+            var result = _validationService.Validate(entity, true);
 
             if (!result.CreationResult.Success)
                 return result;
-
-            foreach (var installment in result.CreationResult.Value.PaymentInstallments)
-            {
-                installment.PaymentId = result.CreationResult.Value.Id;
-            }
 
             return result;
         }

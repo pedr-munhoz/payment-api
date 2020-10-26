@@ -29,6 +29,8 @@ namespace payment_api
 
             services.TryAddSingleton<IPaymentDbService, PaymentDbService>();
 
+            services.TryAddSingleton<IPaymentInstallmentDbService, PaymentInstallmentDbService>();
+
             services.TryAddSingleton<IAntecipationDbService, AntecipationDbService>();
 
             services.TryAddSingleton<IPaymentProcessService, PaymentProcessService>();

@@ -30,16 +30,33 @@ namespace payment_api.Models.Service
             return entity;
         }
 
-        public async Task<PaymentEntity> Get(int nsu)
-            => await _dbContext.Set<PaymentEntity>()
-                    .AsQueryable()
-                    .Where(payment => payment.Id == nsu)
+        public async Task<PaymentEntity> Get(int id)
+        {
+            var entity = await _dbContext.Set<PaymentEntity>()
+                    .Where(payment => payment.Id == id)
                     .FirstOrDefaultAsync();
 
+            entity.PaymentInstallments = await _dbContext.Set<PaymentInstallmentEntity>()
+                                                    .Where(x => x.PaymentId == id)
+                                                    .ToListAsync();
+
+            return entity;
+        }
+
         public async Task<List<PaymentEntity>> GetAvailablePayments()
-            => await _dbContext.Set<PaymentEntity>()
-                    .AsQueryable()
+        {
+            var entities = await _dbContext.Set<PaymentEntity>()
                     .Where(payment => payment.Anticipated == null)
                     .ToListAsync();
+
+            foreach (var entity in entities)
+            {
+                entity.PaymentInstallments = await _dbContext.Set<PaymentInstallmentEntity>()
+                                                    .Where(x => x.PaymentId == entity.Id)
+                                                    .ToListAsync();
+            }
+
+            return entities;
+        }
     }
 }
