@@ -15,6 +15,6 @@ namespace payment_api.Models
         public double? AntecipatedValue { get; set; }
 
         [NotMapped]
-        public HashSet<PaymentEntity> SolicitedPayments { get; set; } = new HashSet<PaymentEntity>();
+        public List<PaymentEntity> SolicitedPayments { get; set; } = new List<PaymentEntity>();
     }
 }
