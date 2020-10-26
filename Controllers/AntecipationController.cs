@@ -56,7 +56,7 @@ namespace payment_api.Controllers
         }
 
         [HttpPatch("resolve-analysis")]
-        public async Task<ActionResult> StartAnalysis([FromQuery] int id, bool approve, [FromBody] List<int> paymentIds)
+        public async Task<ActionResult> ResolvePaymentAntecipation([FromQuery] int id, bool approve, [FromBody] List<int> paymentIds)
         {
             var result = await _antecipationDbService.ResolvePaymentAntecipation(id, paymentIds, approve);
 

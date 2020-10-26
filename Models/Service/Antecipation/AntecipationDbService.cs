@@ -10,6 +10,7 @@ namespace payment_api.Models.Service
 {
     public class AntecipationDbService : IAntecipationDbService
     {
+        private const double TaxRate = 0.962;
         private readonly ServerDbContext _dbContext;
 
         private readonly IPaymentDbService _paymentDbService;
@@ -58,7 +59,7 @@ namespace payment_api.Models.Service
                     if (payment.SolicitationId == null)
                     {
                         payment.SolicitationId = entity.Id;
-                        entity.SolicitedValue += payment.LiquidValue * 0.962;
+                        entity.SolicitedValue += payment.LiquidValue * TaxRate;
                         entity.SolicitedPayments.Add(payment);
                     }
                 }
@@ -178,6 +179,19 @@ namespace payment_api.Models.Service
             foreach (var payment in payments)
             {
                 payment.Anticipated = approve;
+                var installments = await _dbContext.Set<PaymentInstallmentEntity>()
+                                            .Where(x => x.PaymentId == payment.Id)
+                                            .ToListAsync();
+
+                payment.PaymentInstallments.AddRange(installments);
+
+                if (approve)
+                {
+                    foreach (var installment in installments)
+                    {
+                        installment.AnticipatedValue = installment.LiquidValue * TaxRate;
+                    }
+                }
             }
 
             await _dbContext.SaveChangesAsync();
