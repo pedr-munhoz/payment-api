@@ -7,6 +7,12 @@ namespace payment_api.Models.Result
             Value = value;
             Success = success;
         }
+        public PaymentProcessResult(PaymentEntity value, bool success, string errorMessage)
+        {
+            Value = value;
+            Success = success;
+            ErrorMessage = errorMessage;
+        }
 
         public PaymentProcessResult(bool success)
         {
@@ -17,6 +23,6 @@ namespace payment_api.Models.Result
 
         public bool Success { get; set; }
 
-        public string ErrorMessage => throw new System.NotImplementedException();
+        public string ErrorMessage { get; set; }
     }
 }

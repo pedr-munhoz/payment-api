@@ -8,6 +8,7 @@ namespace payment_api.Models.Service
     public class PaymentProcessService : IPaymentProcessService
     {
         private const double FixTax = 0.90;
+        private const string UnprocessableCreditCard = "5999";
         private readonly IPaymentDbService _paymentDbService;
         private readonly IResultService _resultService;
 
@@ -22,15 +23,29 @@ namespace payment_api.Models.Service
 
         public async Task<PaymentProcessResult> ProcessPayment(PaymentRequest request, DateTime transactionDate)
         {
-            if (request.CreditCard.Substring(0, 4) == "5999")
+            if (request.CreditCard.Substring(0, 4) == UnprocessableCreditCard)
             {
-                return _resultService.GenerateFailedResult();
+                var rejectedPayment = new PaymentEntity
+                {
+                    TransactionDate = transactionDate,
+                    Approved = false,
+                    CancelDate = transactionDate,
+                    RawValue = request.RawValue,
+                    LiquidValue = request.RawValue - FixTax,
+                    Tax = FixTax,
+                    CreditCard = request.CreditCard.Substring(12),
+                };
+
+                await _paymentDbService.Create(rejectedPayment);
+
+                return _resultService.GenerateFailedResult(rejectedPayment, "CreditCard denied.");
             }
 
             var payment = new PaymentEntity
             {
                 TransactionDate = transactionDate,
                 Approved = true,
+                AprovalDate = transactionDate,
                 RawValue = request.RawValue,
                 LiquidValue = request.RawValue - FixTax,
                 Tax = FixTax,

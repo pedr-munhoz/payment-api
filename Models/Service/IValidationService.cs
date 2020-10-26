@@ -6,6 +6,6 @@ namespace payment_api.Models.Service
     {
         PaymentProcessResult GenerateResult(PaymentEntity payment, bool approved);
 
-        PaymentProcessResult GenerateFailedResult();
+        PaymentProcessResult GenerateFailedResult(PaymentEntity payment, string eerrorMessage);
     }
 }

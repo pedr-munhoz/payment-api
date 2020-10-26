@@ -34,7 +34,7 @@ namespace payment_api.Controllers
             var result = await _paymentProcessService.ProcessPayment(paymentRequest, DateTime.Now);
 
             if (!result.Success)
-                return UnprocessableEntity("CreditCard denied");
+                return UnprocessableEntity(result);
 
             return Created($"/{result.Value.Id}", result.Value);
         }

@@ -7,8 +7,8 @@ namespace payment_api.Models.Service
         public PaymentProcessResult GenerateResult(PaymentEntity payment, bool approved)
             => new PaymentProcessResult(payment, approved);
 
-        public PaymentProcessResult GenerateFailedResult()
-            => new PaymentProcessResult(false);
+        public PaymentProcessResult GenerateFailedResult(PaymentEntity payment, string errorMessage)
+            => new PaymentProcessResult(payment, false, errorMessage);
 
     }
 }
