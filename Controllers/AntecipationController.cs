@@ -41,7 +41,10 @@ namespace payment_api.Controllers
         {
             var result = await _antecipationDbService.Create(paymentIds, DateTime.Now);
 
-            return Created("", result);
+            if (!result.Success)
+                return UnprocessableEntity(result.ErrorMessage);
+
+            return Created("", result.Value);
         }
 
         [HttpPatch("start-analysis/{id:int}")]

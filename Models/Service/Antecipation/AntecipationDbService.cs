@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using payment_api.Infrastructure.Database;
+using payment_api.Models.Result;
 
 namespace payment_api.Models.Service
 {
@@ -19,8 +20,20 @@ namespace payment_api.Models.Service
             _paymentDbService = paymentDbService;
         }
 
-        public async Task<AntecipationEntity> Create(List<int> paymentIds, DateTime solicitationDate)
+        public async Task<SolicitationProcessResult> Create(List<int> paymentIds, DateTime solicitationDate)
         {
+            var openSolicitations = await Get("pending");
+            if (openSolicitations.Count != 0)
+            {
+                return new SolicitationProcessResult("Cannot open solicitation without finilizing the current one.");
+            }
+
+            openSolicitations = await Get("analyzing");
+            if (openSolicitations.Count != 0)
+            {
+                return new SolicitationProcessResult("Cannot open solicitation without finilizing the current one.");
+            }
+
             var entity = new AntecipationEntity
             {
                 SolicitationDate = solicitationDate,
@@ -32,23 +45,23 @@ namespace payment_api.Models.Service
 
             await _dbContext.SaveChangesAsync();
 
-            foreach (var id in paymentIds)
+            foreach (var paymentId in paymentIds)
             {
                 var payment = await _dbContext.Set<PaymentEntity>()
-                                            .Where(x => x.Id == id)
+                                            .Where(x => x.Id == paymentId)
                                             .FirstOrDefaultAsync();
 
                 if (payment != null)
+                {
                     payment.SolicitationId = entity.Id;
-
-                entity.SolicitedValue += payment.LiquidValue;
-
-                entity.SolicitedPayments.Add(payment);
+                    entity.SolicitedValue += payment.LiquidValue * 0.962;
+                    entity.SolicitedPayments.Add(payment);
+                }
             }
 
             await _dbContext.SaveChangesAsync();
 
-            return entity;
+            return new SolicitationProcessResult(entity);
         }
 
         public async Task<AntecipationEntity> Get(int id)

@@ -16,5 +16,7 @@ namespace payment_api.Models.Result
         public PaymentEntity Value { get; set; }
 
         public bool Success { get; set; }
+
+        public string ErrorMessage => throw new System.NotImplementedException();
     }
 }

@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using payment_api.Models.Result;
 
 namespace payment_api.Models.Service
 {
     public interface IAntecipationDbService
     {
-        Task<AntecipationEntity> Create(List<int> paymentIds, DateTime solicitationDate);
+        Task<SolicitationProcessResult> Create(List<int> paymentIds, DateTime solicitationDate);
 
         Task<AntecipationEntity> StartAnalysis(int id, DateTime startDate);
 
