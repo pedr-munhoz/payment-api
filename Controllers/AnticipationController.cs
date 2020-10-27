@@ -58,7 +58,7 @@ namespace payment_api.Controllers
         [HttpPatch("{id:int}/approve")]
         public async Task<ActionResult> ApprovePaymentAnticipation(int id, [FromBody] List<int> paymentIds)
         {
-            var result = await _anticipationDbService.ResolvePaymentAnticipation(id, paymentIds, true);
+            var result = await _anticipationDbService.ResolvePaymentAnticipation(id, paymentIds, true, DateTime.Now);
 
             if (!result.Success)
             {
@@ -74,7 +74,7 @@ namespace payment_api.Controllers
         [HttpPatch("{id:int}/reject")]
         public async Task<ActionResult> RejectPaymentAnticipation(int id, [FromBody] List<int> paymentIds)
         {
-            var result = await _anticipationDbService.ResolvePaymentAnticipation(id, paymentIds, false);
+            var result = await _anticipationDbService.ResolvePaymentAnticipation(id, paymentIds, false, DateTime.Now);
 
             if (!result.Success)
             {

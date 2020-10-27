@@ -152,7 +152,7 @@ namespace payment_api.Models.Service
             return _resultService.GenerateResult(entity);
         }
 
-        public async Task<AnticipationResult> ResolvePaymentAnticipation(int anticipationId, List<int> paymentIds, bool approve)
+        public async Task<AnticipationResult> ResolvePaymentAnticipation(int anticipationId, List<int> paymentIds, bool approve, DateTime timeStamp)
         {
             var entity = await Get(anticipationId);
 
@@ -161,7 +161,7 @@ namespace payment_api.Models.Service
 
             // if the analysis process isnt started, start it now
             if (entity.Analysis.StartDate == null)
-                await StartAnalysis(anticipationId, DateTime.Now);
+                await StartAnalysis(anticipationId, timeStamp);
 
             var paymentsToResolve = entity.SolicitedPayments
                                     .AsQueryable()
@@ -215,7 +215,7 @@ namespace payment_api.Models.Service
 
                         foreach (var installment in installments)
                         {
-                            installment.AnticipatedTranferDate = DateTime.Now;
+                            installment.AnticipatedTranferDate = timeStamp;
                             installment.AnticipatedValue = installment.LiquidValue * TaxRate;
                             entity.AnticipatedValue += installment.LiquidValue * TaxRate;
                         }
@@ -228,7 +228,7 @@ namespace payment_api.Models.Service
                     }
                 }
 
-                entity.Analysis.EndDate = DateTime.Now;
+                entity.Analysis.EndDate = timeStamp;
 
                 if (deniedTrigger && !acceptedTrigger)
                     entity.Analysis.FinalStatus = "denied";

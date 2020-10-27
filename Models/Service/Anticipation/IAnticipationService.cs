@@ -15,6 +15,6 @@ namespace payment_api.Models.Service
 
         Task<List<AnticipationEntity>> Get(string status = null);
 
-        Task<AnticipationResult> ResolvePaymentAnticipation(int anticipationId, List<int> paymentIds, bool approve);
+        Task<AnticipationResult> ResolvePaymentAnticipation(int anticipationId, List<int> paymentIds, bool approve, DateTime timestamp);
     }
 }
