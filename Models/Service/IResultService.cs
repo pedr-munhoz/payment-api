@@ -6,7 +6,7 @@ namespace payment_api.Models.Service
     {
         PaymentProcessResult GenerateResult(PaymentEntity payment, bool approved);
 
-        AnticipationResult GenerateResult(AntecipationEntity anticipation);
+        AnticipationResult GenerateResult(AnticipationEntity anticipation);
 
         PaymentProcessResult GenerateFailedResult(PaymentEntity payment, string eerrorMessage);
 

@@ -7,15 +7,15 @@ using payment_api.Models.Service;
 
 namespace payment_api.Controllers
 {
-    public class AntecipationController : BaseController
+    public class AnticipationController : BaseController
     {
         private readonly IPaymentDbService _paymentDbService;
-        private readonly IAnticipationService _antecipationDbService;
+        private readonly IAnticipationService _anticipationDbService;
 
-        public AntecipationController(IPaymentDbService paymentDbService, IAnticipationService antecipationDbService)
+        public AnticipationController(IPaymentDbService paymentDbService, IAnticipationService anticipationDbService)
         {
             _paymentDbService = paymentDbService;
-            _antecipationDbService = antecipationDbService;
+            _anticipationDbService = anticipationDbService;
         }
 
         [HttpGet("avaliable-payments")]
@@ -31,15 +31,15 @@ namespace payment_api.Controllers
             if (status != null && status != "pending" && status != "analyzing" && status != "finished")
                 return BadRequest("Possible values for status: 'null', 'pending', 'analyzing' or 'finished'");
 
-            var antecipations = await _antecipationDbService.Get(status);
+            var anticipations = await _anticipationDbService.Get(status);
 
-            return Ok(antecipations);
+            return Ok(anticipations);
         }
 
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] List<int> paymentIds)
         {
-            var result = await _antecipationDbService.Create(paymentIds, DateTime.Now);
+            var result = await _anticipationDbService.Create(paymentIds, DateTime.Now);
 
             if (!result.Success)
                 return UnprocessableEntity(result.ErrorMessage);
@@ -50,15 +50,15 @@ namespace payment_api.Controllers
         [HttpPatch("start-analysis/{id:int}")]
         public async Task<ActionResult> StartAnalysis(int id)
         {
-            var result = await _antecipationDbService.StartAnalysis(id, DateTime.Now);
+            var result = await _anticipationDbService.StartAnalysis(id, DateTime.Now);
 
             return Ok(result);
         }
 
         [HttpPatch("{id:int}/approve")]
-        public async Task<ActionResult> ApprovePaymentAntecipation(int id, [FromBody] List<int> paymentIds)
+        public async Task<ActionResult> ApprovePaymentAnticipation(int id, [FromBody] List<int> paymentIds)
         {
-            var result = await _antecipationDbService.ResolvePaymentAntecipation(id, paymentIds, true);
+            var result = await _anticipationDbService.ResolvePaymentAnticipation(id, paymentIds, true);
 
             if (!result.Success)
             {
@@ -72,9 +72,9 @@ namespace payment_api.Controllers
         }
 
         [HttpPatch("{id:int}/reject")]
-        public async Task<ActionResult> RejectPaymentAntecipation(int id, [FromBody] List<int> paymentIds)
+        public async Task<ActionResult> RejectPaymentAnticipation(int id, [FromBody] List<int> paymentIds)
         {
-            var result = await _antecipationDbService.ResolvePaymentAntecipation(id, paymentIds, false);
+            var result = await _anticipationDbService.ResolvePaymentAnticipation(id, paymentIds, false);
 
             if (!result.Success)
             {

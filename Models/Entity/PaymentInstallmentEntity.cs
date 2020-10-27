@@ -22,6 +22,6 @@ namespace payment_api.Models
         [Required(ErrorMessage = "DueDate is required")]
         public DateTime DueDate { get; set; }
 
-        public DateTime? AntecipatedTranfer { get; set; }
+        public DateTime? AnticipatedTranferDate { get; set; }
     }
 }

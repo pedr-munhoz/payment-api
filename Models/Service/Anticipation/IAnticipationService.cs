@@ -11,10 +11,10 @@ namespace payment_api.Models.Service
 
         Task<AnticipationResult> StartAnalysis(int id, DateTime startDate);
 
-        Task<AntecipationEntity> Get(int id);
+        Task<AnticipationEntity> Get(int id);
 
-        Task<List<AntecipationEntity>> Get(string status = null);
+        Task<List<AnticipationEntity>> Get(string status = null);
 
-        Task<AnticipationResult> ResolvePaymentAntecipation(int antecipationId, List<int> paymentIds, bool approve);
+        Task<AnticipationResult> ResolvePaymentAnticipation(int anticipationId, List<int> paymentIds, bool approve);
     }
 }

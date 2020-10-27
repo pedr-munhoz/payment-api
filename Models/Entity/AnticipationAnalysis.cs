@@ -2,7 +2,7 @@ using System;
 
 namespace payment_api.Models
 {
-    public class AntecipationAnalysis : DbEntity
+    public class AnticipationAnalysis : DbEntity
     {
         public DateTime? StartDate { get; set; }
 
@@ -10,6 +10,6 @@ namespace payment_api.Models
 
         public string FinalStatus { get; set; }
 
-        public int AntecipationId { get; set; }
+        public int AnticipationId { get; set; }
     }
 }

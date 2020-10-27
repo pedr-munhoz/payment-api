@@ -10,7 +10,7 @@ namespace payment_api.Models.Service
         public PaymentProcessResult GenerateFailedResult(PaymentEntity payment, string errorMessage)
             => new PaymentProcessResult(payment, false, errorMessage);
 
-        public AnticipationResult GenerateResult(AntecipationEntity anticipation)
+        public AnticipationResult GenerateResult(AnticipationEntity anticipation)
             => new AnticipationResult(anticipation);
 
         public AnticipationResult GenerateFailedResult(string errorMessage, bool unprocessableEntity = false)

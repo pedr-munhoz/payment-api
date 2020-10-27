@@ -24,7 +24,7 @@ namespace payment_api.Models.Service
         public async Task<AnticipationResult> Create(List<int> paymentIds, DateTime solicitationDate)
         {
             // Check if there's a open solicitation
-            var openAnalysis = await _dbContext.Set<AntecipationAnalysis>()
+            var openAnalysis = await _dbContext.Set<AnticipationAnalysis>()
                                         .Where(x => x.EndDate == null)
                                         .FirstOrDefaultAsync();
             if (openAnalysis != null)
@@ -38,7 +38,7 @@ namespace payment_api.Models.Service
                 return _resultService.GenerateFailedResult("None of the solicited payments are available for anticipation.", true);
 
 
-            var entity = new AntecipationEntity
+            var entity = new AnticipationEntity
             {
                 SolicitationDate = solicitationDate,
                 SolicitedValue = 0,
@@ -48,7 +48,7 @@ namespace payment_api.Models.Service
 
             await _dbContext.SaveChangesAsync();
 
-            // sets the payment.solicitationId fields to the current antecipation id
+            // sets the payment.solicitationId fields to the current anticipation id
             // needs to be done after the SaveChangesAsync so the id is set.
             foreach (var payment in payments)
             {
@@ -56,9 +56,9 @@ namespace payment_api.Models.Service
                 entity.SolicitedValue += payment.LiquidValue * TaxRate;
             }
 
-            var analysis = new AntecipationAnalysis
+            var analysis = new AnticipationAnalysis
             {
-                AntecipationId = entity.Id
+                AnticipationId = entity.Id
             };
 
             await _dbContext.AddAsync(analysis);
@@ -70,11 +70,11 @@ namespace payment_api.Models.Service
             return _resultService.GenerateResult(entity);
         }
 
-        public async Task<AntecipationEntity> Get(int id)
+        public async Task<AnticipationEntity> Get(int id)
         {
-            var entity = await _dbContext.Set<AntecipationEntity>()
+            var entity = await _dbContext.Set<AnticipationEntity>()
                                     .AsQueryable()
-                                    .Where(antecipation => antecipation.Id == id)
+                                    .Where(x => x.Id == id)
                                     .FirstOrDefaultAsync();
 
             if (entity == null)
@@ -85,22 +85,22 @@ namespace payment_api.Models.Service
             return entity;
         }
 
-        public async Task<List<AntecipationEntity>> Get(string status = null)
+        public async Task<List<AnticipationEntity>> Get(string status = null)
         {
-            var antecipations = new List<AntecipationEntity>();
+            var anticipations = new List<AnticipationEntity>();
             if (status == null)
             {
                 // retorna todas as antecipações
-                antecipations = await _dbContext.Set<AntecipationEntity>()
+                anticipations = await _dbContext.Set<AnticipationEntity>()
                                 .AsNoTracking()
                                 .ToListAsync();
 
-                await FillInternalEntities(antecipations);
+                await FillInternalEntities(anticipations);
 
-                return antecipations;
+                return anticipations;
             }
 
-            var analysisQueryable = _dbContext.Set<AntecipationAnalysis>()
+            var analysisQueryable = _dbContext.Set<AnticipationAnalysis>()
                             .AsNoTracking();
 
             switch (status)
@@ -122,14 +122,14 @@ namespace payment_api.Models.Service
 
             foreach (var item in analysis)
             {
-                antecipations.Add(await _dbContext.Set<AntecipationEntity>()
-                                    .Where(x => x.Id == item.AntecipationId)
+                anticipations.Add(await _dbContext.Set<AnticipationEntity>()
+                                    .Where(x => x.Id == item.AnticipationId)
                                     .FirstOrDefaultAsync());
             }
 
-            await FillInternalEntities(antecipations);
+            await FillInternalEntities(anticipations);
 
-            return antecipations;
+            return anticipations;
         }
 
         public async Task<AnticipationResult> StartAnalysis(int id, DateTime startDate)
@@ -149,16 +149,16 @@ namespace payment_api.Models.Service
             return _resultService.GenerateResult(entity);
         }
 
-        public async Task<AnticipationResult> ResolvePaymentAntecipation(int antecipationId, List<int> paymentIds, bool approve)
+        public async Task<AnticipationResult> ResolvePaymentAnticipation(int anticipationId, List<int> paymentIds, bool approve)
         {
-            var entity = await Get(antecipationId);
+            var entity = await Get(anticipationId);
 
             if (entity == null)
-                return _resultService.GenerateFailedResult($"No antecipation request found for id = {antecipationId}.");
+                return _resultService.GenerateFailedResult($"No anticipation request found for id = {anticipationId}.");
 
             // if the analysis process isnt started, start it now
             if (entity.Analysis.StartDate == null)
-                await StartAnalysis(antecipationId, DateTime.Now);
+                await StartAnalysis(anticipationId, DateTime.Now);
 
             var paymentsToResolve = entity.SolicitedPayments
                                     .AsQueryable()
@@ -191,7 +191,7 @@ namespace payment_api.Models.Service
             await _dbContext.SaveChangesAsync();
 
             var pendingPayments = await _dbContext.Set<PaymentEntity>()
-                                        .Where(payment => payment.SolicitationId == antecipationId && payment.Anticipated == null)
+                                        .Where(payment => payment.SolicitationId == anticipationId && payment.Anticipated == null)
                                         .ToListAsync();
 
             // Check if all payments in this solicitation were evaluated.
@@ -199,7 +199,7 @@ namespace payment_api.Models.Service
             {
                 var deniedTrigger = false;
                 var acceptedTrigger = false;
-                entity.AntecipatedValue = 0;
+                entity.AnticipatedValue = 0;
                 foreach (var payment in entity.SolicitedPayments)
                 {
                     if (payment.Anticipated == true)
@@ -212,9 +212,9 @@ namespace payment_api.Models.Service
 
                         foreach (var installment in installments)
                         {
-                            installment.AntecipatedTranfer = DateTime.Now;
+                            installment.AnticipatedTranferDate = DateTime.Now;
                             installment.AnticipatedValue = installment.LiquidValue * TaxRate;
-                            entity.AntecipatedValue += installment.LiquidValue * TaxRate;
+                            entity.AnticipatedValue += installment.LiquidValue * TaxRate;
                         }
 
                         payment.PaymentInstallments = installments;
@@ -243,7 +243,7 @@ namespace payment_api.Models.Service
             return _resultService.GenerateResult(entity);
         }
 
-        private async Task FillInternalEntities(List<AntecipationEntity> entities)
+        private async Task FillInternalEntities(List<AnticipationEntity> entities)
         {
             foreach (var entity in entities)
             {
@@ -251,14 +251,14 @@ namespace payment_api.Models.Service
             }
         }
 
-        private async Task FillInternalEntities(AntecipationEntity entity)
+        private async Task FillInternalEntities(AnticipationEntity entity)
         {
             entity.SolicitedPayments = await _dbContext.Set<PaymentEntity>()
                                                 .Where(x => x.SolicitationId == entity.Id)
                                                 .ToListAsync();
 
-            entity.Analysis = await _dbContext.Set<AntecipationAnalysis>()
-                                        .Where(x => x.AntecipationId == entity.Id)
+            entity.Analysis = await _dbContext.Set<AnticipationAnalysis>()
+                                        .Where(x => x.AnticipationId == entity.Id)
                                               .FirstOrDefaultAsync();
         }
     }

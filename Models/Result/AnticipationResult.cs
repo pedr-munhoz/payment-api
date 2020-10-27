@@ -1,6 +1,6 @@
 namespace payment_api.Models.Result
 {
-    public class AnticipationResult : IResult<AntecipationEntity>
+    public class AnticipationResult : IResult<AnticipationEntity>
     {
         public AnticipationResult(string errorMessage, bool unprocessableEntity = false)
         {
@@ -9,13 +9,13 @@ namespace payment_api.Models.Result
             UnprocessableEntity = unprocessableEntity;
         }
 
-        public AnticipationResult(AntecipationEntity value)
+        public AnticipationResult(AnticipationEntity value)
         {
             Success = true;
             Value = value;
         }
 
-        public AntecipationEntity Value { get; set; }
+        public AnticipationEntity Value { get; set; }
 
         public bool UnprocessableEntity { get; set; }
 
