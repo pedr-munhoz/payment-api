@@ -33,6 +33,6 @@ namespace payment_api.Models
         [NotMapped]
         public int Nsu { get => Id; }
 
-        public int? SolicitationId { get; set; }
+        public int? AnticipationId { get; set; }
     }
 }

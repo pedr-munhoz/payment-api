@@ -31,7 +31,7 @@ namespace payment_api.Models.Service
                 return _resultService.GenerateFailedResult("Cannot open solicitation without finilizing the current one.", true);
 
             var payments = await _dbContext.Set<PaymentEntity>()
-                                    .Where(x => paymentIds.Contains(x.Id) && x.SolicitationId == null)
+                                    .Where(x => paymentIds.Contains(x.Id) && x.AnticipationId == null)
                                     .ToListAsync();
 
             if (payments.Count() == 0)
@@ -52,7 +52,7 @@ namespace payment_api.Models.Service
             // needs to be done after the SaveChangesAsync so the id is set.
             foreach (var payment in payments)
             {
-                payment.SolicitationId = entity.Id;
+                payment.AnticipationId = entity.Id;
                 entity.SolicitedValue += payment.LiquidValue * TaxRate;
             }
 
@@ -191,7 +191,7 @@ namespace payment_api.Models.Service
             await _dbContext.SaveChangesAsync();
 
             var pendingPayments = await _dbContext.Set<PaymentEntity>()
-                                        .Where(payment => payment.SolicitationId == anticipationId && payment.Anticipated == null)
+                                        .Where(payment => payment.AnticipationId == anticipationId && payment.Anticipated == null)
                                         .ToListAsync();
 
             // Check if all payments in this solicitation were evaluated.
@@ -254,7 +254,7 @@ namespace payment_api.Models.Service
         private async Task FillInternalEntities(AnticipationEntity entity)
         {
             entity.SolicitedPayments = await _dbContext.Set<PaymentEntity>()
-                                                .Where(x => x.SolicitationId == entity.Id)
+                                                .Where(x => x.AnticipationId == entity.Id)
                                                 .ToListAsync();
 
             entity.Analysis = await _dbContext.Set<AnticipationAnalysis>()
