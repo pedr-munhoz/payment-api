@@ -13,12 +13,9 @@ namespace payment_api.Models.Service
         private const double TaxRate = 0.962;
         private readonly ServerDbContext _dbContext;
 
-        private readonly IPaymentDbService _paymentDbService;
-
-        public AntecipationDbService(ServerDbContext dbContext, IPaymentDbService paymentDbService)
+        public AntecipationDbService(ServerDbContext dbContext)
         {
             _dbContext = dbContext;
-            _paymentDbService = paymentDbService;
         }
 
         public async Task<SolicitationProcessResult> Create(List<int> paymentIds, DateTime solicitationDate)
@@ -28,9 +25,7 @@ namespace payment_api.Models.Service
                                         .Where(x => x.EndDate == null)
                                         .FirstOrDefaultAsync();
             if (openAnalysis != null)
-            {
                 return new SolicitationProcessResult("Cannot open solicitation without finilizing the current one.", true);
-            }
 
             var payments = await _dbContext.Set<PaymentEntity>()
                                     .Where(x => paymentIds.Contains(x.Id) && x.SolicitationId == null)
@@ -38,7 +33,6 @@ namespace payment_api.Models.Service
 
             if (payments.Count() == 0)
                 return new SolicitationProcessResult("None of the solicited payments are available for anticipation.", true);
-
 
 
             var entity = new AntecipationEntity
@@ -51,15 +45,12 @@ namespace payment_api.Models.Service
 
             await _dbContext.SaveChangesAsync();
 
-
-
             // sets the payment.solicitationId fields to the current antecipation id
             // needs to be done after the SaveChangesAsync so the id is set.
             foreach (var payment in payments)
             {
                 payment.SolicitationId = entity.Id;
                 entity.SolicitedValue += payment.LiquidValue * TaxRate;
-                entity.SolicitedPayments.Add(payment);
             }
 
             var analysis = new AntecipationAnalysis
@@ -71,7 +62,7 @@ namespace payment_api.Models.Service
 
             await _dbContext.SaveChangesAsync();
 
-            entity.Analysis = analysis;
+            await FillInternalEntities(entity);
 
             return new SolicitationProcessResult(entity);
         }
@@ -86,71 +77,55 @@ namespace payment_api.Models.Service
             if (entity == null)
                 return entity;
 
-            entity.SolicitedPayments = await _dbContext.Set<PaymentEntity>()
-                                                .Where(x => x.SolicitationId == id)
-                                                .ToListAsync();
-
-            entity.Analysis = await _dbContext.Set<AntecipationAnalysis>()
-                                            .Where(x => x.AntecipationId == entity.Id)
-                                                  .FirstOrDefaultAsync();
+            await FillInternalEntities(entity);
 
             return entity;
         }
 
         public async Task<List<AntecipationEntity>> Get(string status = null)
         {
-            var analysis = new List<AntecipationAnalysis>();
             var antecipations = new List<AntecipationEntity>();
-            if (status == "pending")
+            if (status == null)
             {
-                analysis = await _dbContext.Set<AntecipationAnalysis>()
-                            .AsNoTracking()
-                            .Where(x => x.StartDate == null)
-                            .ToListAsync();
-            }
-
-            else if (status == "analyzing")
-            {
-                analysis = await _dbContext.Set<AntecipationAnalysis>()
-                            .AsNoTracking()
-                            .Where(x => x.StartDate != null && x.EndDate == null)
-                            .ToListAsync();
-            }
-
-            else if (status == "finished")
-            {
-                analysis = await _dbContext.Set<AntecipationAnalysis>()
-                            .AsNoTracking()
-                            .Where(x => x.EndDate != null)
-                            .ToListAsync();
-            }
-
-            else
-            {
+                // retorna todas as antecipações
                 antecipations = await _dbContext.Set<AntecipationEntity>()
                                 .AsNoTracking()
                                 .ToListAsync();
+
+                await FillInternalEntities(antecipations);
+
+                return antecipations;
             }
+
+            var analysisQueryable = _dbContext.Set<AntecipationAnalysis>()
+                            .AsNoTracking();
+
+            switch (status)
+            {
+                case "pending":
+                    analysisQueryable = analysisQueryable.Where(x => x.StartDate == null);
+                    break;
+
+                case "analyzing":
+                    analysisQueryable = analysisQueryable.Where(x => x.StartDate != null && x.EndDate == null);
+                    break;
+
+                case "finished":
+                    analysisQueryable = analysisQueryable.Where(x => x.EndDate != null);
+                    break;
+            }
+
+            var analysis = await analysisQueryable.ToListAsync();
 
             foreach (var item in analysis)
             {
                 antecipations.Add(await _dbContext.Set<AntecipationEntity>()
                                     .Where(x => x.Id == item.AntecipationId)
                                     .FirstOrDefaultAsync());
-
-
             }
 
-            foreach (var entity in antecipations)
-            {
-                entity.SolicitedPayments = await _dbContext.Set<PaymentEntity>()
-                                                .Where(x => x.SolicitationId == entity.Id)
-                                                .ToListAsync();
+            await FillInternalEntities(antecipations);
 
-                entity.Analysis = await _dbContext.Set<AntecipationAnalysis>()
-                                            .Where(x => x.AntecipationId == entity.Id)
-                                                  .FirstOrDefaultAsync();
-            }
             return antecipations;
         }
 
@@ -161,18 +136,12 @@ namespace payment_api.Models.Service
             if (entity == null)
                 return new SolicitationProcessResult($"No solicitation found for id = ${id}");
 
-            var analysis = await _dbContext.Set<AntecipationAnalysis>()
-                                        .Where(x => x.AntecipationId == id)
-                                        .FirstOrDefaultAsync();
-
-            if (analysis.StartDate != null)
+            if (entity.Analysis.StartDate != null)
                 return new SolicitationProcessResult("Analysis is already started", true);
 
-            analysis.StartDate = startDate;
+            entity.Analysis.StartDate = startDate;
 
             await _dbContext.SaveChangesAsync();
-
-            entity.Analysis = analysis;
 
             return new SolicitationProcessResult(entity);
         }
@@ -253,28 +222,41 @@ namespace payment_api.Models.Service
                     }
                 }
 
-                var analysis = await _dbContext.Set<AntecipationAnalysis>()
-                                    .Where(x => x.AntecipationId == antecipationId)
-                                    .FirstOrDefaultAsync();
-
-                entity.Analysis = analysis;
-
-                analysis.EndDate = DateTime.Now;
+                entity.Analysis.EndDate = DateTime.Now;
 
                 if (deniedTrigger && !acceptedTrigger)
-                    analysis.FinalStatus = "denied";
+                    entity.Analysis.FinalStatus = "denied";
 
                 else if (deniedTrigger && acceptedTrigger)
-                    analysis.FinalStatus = "partially approved";
+                    entity.Analysis.FinalStatus = "partially approved";
 
                 else
-                    analysis.FinalStatus = "approved";
+                    entity.Analysis.FinalStatus = "approved";
 
 
                 await _dbContext.SaveChangesAsync();
             }
 
             return new SolicitationProcessResult(entity);
+        }
+
+        private async Task FillInternalEntities(List<AntecipationEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                await FillInternalEntities(entity);
+            }
+        }
+
+        private async Task FillInternalEntities(AntecipationEntity entity)
+        {
+            entity.SolicitedPayments = await _dbContext.Set<PaymentEntity>()
+                                                .Where(x => x.SolicitationId == entity.Id)
+                                                .ToListAsync();
+
+            entity.Analysis = await _dbContext.Set<AntecipationAnalysis>()
+                                        .Where(x => x.AntecipationId == entity.Id)
+                                              .FirstOrDefaultAsync();
         }
     }
 }
