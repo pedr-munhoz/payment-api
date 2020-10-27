@@ -31,7 +31,7 @@ namespace payment_api
 
             services.TryAddSingleton<IPaymentInstallmentDbService, PaymentInstallmentDbService>();
 
-            services.TryAddSingleton<IAntecipationDbService, AntecipationDbService>();
+            services.TryAddSingleton<IAnticipationService, AnticipationService>();
 
             services.TryAddSingleton<IPaymentProcessService, PaymentProcessService>();
 

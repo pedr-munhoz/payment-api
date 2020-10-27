@@ -8,14 +8,14 @@ using payment_api.Models.Result;
 
 namespace payment_api.Models.Service
 {
-    public class AntecipationDbService : IAntecipationDbService
+    public class AnticipationService : IAnticipationService
     {
         private const double TaxRate = 0.962;
         private readonly ServerDbContext _dbContext;
 
         private readonly IResultService _resultService;
 
-        public AntecipationDbService(ServerDbContext dbContext, IResultService resultService)
+        public AnticipationService(ServerDbContext dbContext, IResultService resultService)
         {
             _dbContext = dbContext;
             _resultService = resultService;
