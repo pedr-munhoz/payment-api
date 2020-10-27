@@ -61,7 +61,12 @@ namespace payment_api.Controllers
             var result = await _antecipationDbService.ResolvePaymentAntecipation(id, paymentIds, true);
 
             if (!result.Success)
+            {
+                if (result.UnprocessableEntity)
+                    return UnprocessableEntity(result.ErrorMessage);
+
                 return NotFound(result.ErrorMessage);
+            }
 
             return Ok(result.Value);
         }
@@ -72,7 +77,12 @@ namespace payment_api.Controllers
             var result = await _antecipationDbService.ResolvePaymentAntecipation(id, paymentIds, false);
 
             if (!result.Success)
+            {
+                if (result.UnprocessableEntity)
+                    return UnprocessableEntity(result.ErrorMessage);
+
                 return NotFound(result.ErrorMessage);
+            }
 
             return Ok(result.Value);
         }

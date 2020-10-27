@@ -29,7 +29,7 @@ namespace payment_api.Models.Service
                                         .FirstOrDefaultAsync();
             if (openAnalysis != null)
             {
-                return new SolicitationProcessResult("Cannot open solicitation without finilizing the current one.");
+                return new SolicitationProcessResult("Cannot open solicitation without finilizing the current one.", true);
             }
 
             var payments = await _dbContext.Set<PaymentEntity>()
@@ -37,7 +37,7 @@ namespace payment_api.Models.Service
                                     .ToListAsync();
 
             if (payments.Count() == 0)
-                return new SolicitationProcessResult("None of the solicited payments are available for anticipation.");
+                return new SolicitationProcessResult("None of the solicited payments are available for anticipation.", true);
 
 
 
@@ -166,7 +166,7 @@ namespace payment_api.Models.Service
                                         .FirstOrDefaultAsync();
 
             if (analysis.StartDate != null)
-                return new SolicitationProcessResult("Analysis is already started");
+                return new SolicitationProcessResult("Analysis is already started", true);
 
             analysis.StartDate = startDate;
 
@@ -184,29 +184,34 @@ namespace payment_api.Models.Service
             if (entity == null)
                 return new SolicitationProcessResult($"No antecipation request found for id = {antecipationId}.");
 
+            // if the analysis process isnt started, start it now
             if (entity.Analysis.StartDate == null)
                 await StartAnalysis(antecipationId, DateTime.Now);
 
-            var payments = entity.SolicitedPayments.AsQueryable()
-                                        .Where(payment => paymentIds.Contains(payment.Id));
+            var paymentsToResolve = entity.SolicitedPayments
+                                    .AsQueryable()
+                                    .Where(payment => paymentIds.Contains(payment.Id) && payment.Anticipated == null);
 
-            foreach (var payment in payments)
+            if (paymentsToResolve.Count() == 0)
+                return new SolicitationProcessResult(
+                    $"None of the solicited payments is available to be {(approve ? "approved" : "rejected")}.",
+                    true
+                    );
+
+            foreach (var payment in paymentsToResolve)
             {
-                if (payment.Anticipated == null)
+                payment.Anticipated = approve;
+                var installments = await _dbContext.Set<PaymentInstallmentEntity>()
+                                            .Where(x => x.PaymentId == payment.Id)
+                                            .ToListAsync();
+
+                payment.PaymentInstallments.AddRange(installments);
+
+                if (approve)
                 {
-                    payment.Anticipated = approve;
-                    var installments = await _dbContext.Set<PaymentInstallmentEntity>()
-                                                .Where(x => x.PaymentId == payment.Id)
-                                                .ToListAsync();
-
-                    payment.PaymentInstallments.AddRange(installments);
-
-                    if (approve)
+                    foreach (var installment in installments)
                     {
-                        foreach (var installment in installments)
-                        {
-                            installment.AnticipatedValue = installment.LiquidValue * TaxRate;
-                        }
+                        installment.AnticipatedValue = installment.LiquidValue * TaxRate;
                     }
                 }
             }
