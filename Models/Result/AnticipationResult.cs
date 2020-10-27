@@ -1,15 +1,15 @@
 namespace payment_api.Models.Result
 {
-    public class SolicitationProcessResult : IResult<AntecipationEntity>
+    public class AnticipationResult : IResult<AntecipationEntity>
     {
-        public SolicitationProcessResult(string errorMessage, bool unprocessableEntity = false)
+        public AnticipationResult(string errorMessage, bool unprocessableEntity = false)
         {
             Success = false;
             ErrorMessage = errorMessage;
             UnprocessableEntity = unprocessableEntity;
         }
 
-        public SolicitationProcessResult(AntecipationEntity value)
+        public AnticipationResult(AntecipationEntity value)
         {
             Success = true;
             Value = value;

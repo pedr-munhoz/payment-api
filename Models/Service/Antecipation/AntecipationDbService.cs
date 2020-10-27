@@ -13,26 +13,29 @@ namespace payment_api.Models.Service
         private const double TaxRate = 0.962;
         private readonly ServerDbContext _dbContext;
 
-        public AntecipationDbService(ServerDbContext dbContext)
+        private readonly IResultService _resultService;
+
+        public AntecipationDbService(ServerDbContext dbContext, IResultService resultService)
         {
             _dbContext = dbContext;
+            _resultService = resultService;
         }
 
-        public async Task<SolicitationProcessResult> Create(List<int> paymentIds, DateTime solicitationDate)
+        public async Task<AnticipationResult> Create(List<int> paymentIds, DateTime solicitationDate)
         {
             // Check if there's a open solicitation
             var openAnalysis = await _dbContext.Set<AntecipationAnalysis>()
                                         .Where(x => x.EndDate == null)
                                         .FirstOrDefaultAsync();
             if (openAnalysis != null)
-                return new SolicitationProcessResult("Cannot open solicitation without finilizing the current one.", true);
+                return _resultService.GenerateFailedResult("Cannot open solicitation without finilizing the current one.", true);
 
             var payments = await _dbContext.Set<PaymentEntity>()
                                     .Where(x => paymentIds.Contains(x.Id) && x.SolicitationId == null)
                                     .ToListAsync();
 
             if (payments.Count() == 0)
-                return new SolicitationProcessResult("None of the solicited payments are available for anticipation.", true);
+                return _resultService.GenerateFailedResult("None of the solicited payments are available for anticipation.", true);
 
 
             var entity = new AntecipationEntity
@@ -64,7 +67,7 @@ namespace payment_api.Models.Service
 
             await FillInternalEntities(entity);
 
-            return new SolicitationProcessResult(entity);
+            return _resultService.GenerateResult(entity);
         }
 
         public async Task<AntecipationEntity> Get(int id)
@@ -129,29 +132,29 @@ namespace payment_api.Models.Service
             return antecipations;
         }
 
-        public async Task<SolicitationProcessResult> StartAnalysis(int id, DateTime startDate)
+        public async Task<AnticipationResult> StartAnalysis(int id, DateTime startDate)
         {
             var entity = await Get(id);
 
             if (entity == null)
-                return new SolicitationProcessResult($"No solicitation found for id = ${id}");
+                return _resultService.GenerateFailedResult($"No solicitation found for id = ${id}");
 
             if (entity.Analysis.StartDate != null)
-                return new SolicitationProcessResult("Analysis is already started", true);
+                return _resultService.GenerateFailedResult("Analysis is already started", true);
 
             entity.Analysis.StartDate = startDate;
 
             await _dbContext.SaveChangesAsync();
 
-            return new SolicitationProcessResult(entity);
+            return _resultService.GenerateResult(entity);
         }
 
-        public async Task<SolicitationProcessResult> ResolvePaymentAntecipation(int antecipationId, List<int> paymentIds, bool approve)
+        public async Task<AnticipationResult> ResolvePaymentAntecipation(int antecipationId, List<int> paymentIds, bool approve)
         {
             var entity = await Get(antecipationId);
 
             if (entity == null)
-                return new SolicitationProcessResult($"No antecipation request found for id = {antecipationId}.");
+                return _resultService.GenerateFailedResult($"No antecipation request found for id = {antecipationId}.");
 
             // if the analysis process isnt started, start it now
             if (entity.Analysis.StartDate == null)
@@ -162,10 +165,10 @@ namespace payment_api.Models.Service
                                     .Where(payment => paymentIds.Contains(payment.Id) && payment.Anticipated == null);
 
             if (paymentsToResolve.Count() == 0)
-                return new SolicitationProcessResult(
-                    $"None of the solicited payments is available to be {(approve ? "approved" : "rejected")}.",
-                    true
-                    );
+                return _resultService.GenerateFailedResult(
+                            $"None of the solicited payments is available to be {(approve ? "approved" : "rejected")}.",
+                            true
+                            );
 
             foreach (var payment in paymentsToResolve)
             {
@@ -237,7 +240,7 @@ namespace payment_api.Models.Service
                 await _dbContext.SaveChangesAsync();
             }
 
-            return new SolicitationProcessResult(entity);
+            return _resultService.GenerateResult(entity);
         }
 
         private async Task FillInternalEntities(List<AntecipationEntity> entities)
