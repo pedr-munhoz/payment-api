@@ -7,7 +7,7 @@ namespace payment_api.Models.Service
 {
     public class PaymentProcessService : IPaymentProcessService
     {
-        private const double FixTax = 0.90;
+        private const double FixedTax = 0.90;
         private const string UnprocessableCreditCard = "5999";
         private readonly IPaymentDbService _paymentDbService;
         private readonly IResultService _resultService;
@@ -23,6 +23,26 @@ namespace payment_api.Models.Service
 
         public async Task<PaymentProcessResult> ProcessPayment(PaymentRequest request, DateTime transactionDate)
         {
+            if (request.RawValue <= FixedTax)
+            {
+                var rejectedPayment = new PaymentEntity
+                {
+                    TransactionDate = transactionDate,
+                    Approved = false,
+                    CancelDate = transactionDate,
+                    RawValue = request.RawValue,
+                    Tax = FixedTax,
+                    CreditCard = request.CreditCard.Substring(12),
+                };
+
+                await _paymentDbService.Create(rejectedPayment);
+
+                return _resultService.GenerateFailedResult(rejectedPayment, $"{nameof(request.RawValue)} must be greater then the {nameof(FixedTax)} ({FixedTax})");
+            }
+
+            if (request.PaymentInstallmentCount == 0)
+                request.PaymentInstallmentCount = 1;
+
             if (request.CreditCard.Substring(0, 4) == UnprocessableCreditCard)
             {
                 var rejectedPayment = new PaymentEntity
@@ -31,14 +51,14 @@ namespace payment_api.Models.Service
                     Approved = false,
                     CancelDate = transactionDate,
                     RawValue = request.RawValue,
-                    LiquidValue = request.RawValue - FixTax,
-                    Tax = FixTax,
+                    LiquidValue = request.RawValue - FixedTax,
+                    Tax = FixedTax,
                     CreditCard = request.CreditCard.Substring(12),
                 };
 
                 await _paymentDbService.Create(rejectedPayment);
 
-                return _resultService.GenerateFailedResult(rejectedPayment, "CreditCard denied.");
+                return _resultService.GenerateFailedResult(rejectedPayment, $"{nameof(request.CreditCard)} denied.");
             }
 
             var payment = new PaymentEntity
@@ -47,8 +67,8 @@ namespace payment_api.Models.Service
                 Approved = true,
                 AprovalDate = transactionDate,
                 RawValue = request.RawValue,
-                LiquidValue = request.RawValue - FixTax,
-                Tax = FixTax,
+                LiquidValue = request.RawValue - FixedTax,
+                Tax = FixedTax,
                 CreditCard = request.CreditCard.Substring(12),
                 PaymentInstallmentCount = request.PaymentInstallmentCount
             };

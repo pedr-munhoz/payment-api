@@ -36,6 +36,9 @@ namespace payment_api.Models.Service
                     .Where(payment => payment.Id == id)
                     .FirstOrDefaultAsync();
 
+            if (entity == null)
+                return null;
+
             entity.PaymentInstallments = await _dbContext.Set<PaymentInstallmentEntity>()
                                                     .Where(x => x.PaymentId == id)
                                                     .ToListAsync();
