@@ -31,7 +31,7 @@ namespace payment_api.Models.Service
                 return _resultService.GenerateFailedResult("Cannot open solicitation without finilizing the current one.", true);
 
             var payments = await _dbContext.Set<PaymentEntity>()
-                                    .Where(x => paymentIds.Contains(x.Id) && x.AnticipationId == null)
+                                    .Where(x => paymentIds.Contains(x.Id) && x.AnticipationId == null && x.Approved == true)
                                     .ToListAsync();
 
             if (payments.Count() == 0)
@@ -138,6 +138,9 @@ namespace payment_api.Models.Service
 
             if (entity == null)
                 return _resultService.GenerateFailedResult($"No solicitation found for id = ${id}");
+
+            if (entity.Analysis.EndDate != null)
+                return _resultService.GenerateFailedResult("Antecipation request is already closed.");
 
             if (entity.Analysis.StartDate != null)
                 return _resultService.GenerateFailedResult("Analysis is already started", true);
