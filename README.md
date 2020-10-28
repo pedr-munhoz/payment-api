@@ -8,36 +8,36 @@ Para consumir a API, consulte a [documentação](https://github.com/pedr-munhoz/
 ## Configuração para executar
 
 ```bash
-# verificar se o dotnet está instalado
+# Verificar se o dotnet está instalado
 $ dotnet -v
-# caso não esteja, instalar o dotnet core https://dotnet.microsoft.com/download
+# Caso não esteja, instalar o dotnet core https://dotnet.microsoft.com/download
 
-# clonar o projeto
+# Clonar o projeto
 $ git clone https://github.com/pedr-munhoz/payment-api.git
 
-# entrar na pasta do projeto
+# Entrar na pasta do projeto
 $ cd payment-api
 	
-# restaurar dependências do projeto
+# Restaurar dependências do projeto
 $ dotnet restore --no-cache
 
-# verificar se o docker está instalado 
+# Verificar se o docker está instalado 
 $ docker -v
-# caso não esteja, instalar o docker https://www.docker.com/get-started
+# Caso não esteja, instalar o docker https://www.docker.com/get-started
 
-# subir o banco no docker
+# Subir o banco no docker
 $ docker pull postgres
 $ docker run --name postgres_test_db -e POSTGRES_PASSWORD=123456 -d -p 5432:5432 postgres
 $ docker start postgres_test_db
 
-# verificar se o dotnet-ef está instalado 
+# Verificar se o EF Core está instalado 
 $ dotnet-ef -v
-# caso não esteja, instalar a ferramenta 
+# Caso não esteja, instalar a ferramenta 
 $ dotnet tool install --global dotnet-ef
 
-# aplicar migrations no banco
+# Aplicar migrations no banco
 $ dotnet ef database update --context ServerDbContext
 
-# servir o projeto em http://localhost:5000/
+# Servir o projeto em http://localhost:5000/
 $ dotnet run
   ```
