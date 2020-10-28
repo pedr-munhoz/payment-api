@@ -1,8 +1,8 @@
 # Assinatura da API aberta.
 
 #### Neste projeto está contido um arquivo json que permite importar uma collection já configurada para importação no Postman.
-- Arquivo para importar collection - https://github.com/pedr-munhoz/payment-api/blob/master/postman_requests_collection
-- Link para baixar o Postman - https://www.postman.com/downloads/
+- [Arquivo para importar collection](https://github.com/pedr-munhoz/payment-api/blob/master/postman_requests_collection)
+- [Link para baixar o Postman](https://www.postman.com/downloads/)
 
 ### Recursos e métodos
 
