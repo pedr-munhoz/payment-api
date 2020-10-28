@@ -38,6 +38,6 @@ $ dotnet tool install --global dotnet-ef
 # Aplicar migrations no banco
 $ dotnet ef database update --context ServerDbContext
 
-# Servir o projeto em http://localhost:5000/
+# Servir o projeto em http://localhost:5000/ e http://localhost:5001/
 $ dotnet run
   ```
