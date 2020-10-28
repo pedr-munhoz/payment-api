@@ -1,0 +1,354 @@
+{
+	"info": {
+		"_postman_id": "aaa51aee-3773-46c5-ad75-f86c3eb70706",
+		"name": "Transação com cartão e antecipação de recebíveis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Efetuar pagamento com cartão de crédito",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"creditcard\" : \"9999789431284588\",\r\n    \"rawvalue\" : 300,\r\n    \"paymentinstallmentcount\" : 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{payments}}/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{payments}}",
+						""
+					]
+				},
+				"description": "exemplo de corpo para a requisição\r\n```json\r\n{\r\n    \"creditcard\" : \"9999789431284588\",\r\n    \"rawvalue\" : 300,\r\n    \"paymentinstallmentcount\" : 2\r\n}\r\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar uma transação e suas parcelas a partir do id da transação",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{payments}}/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{payments}}",
+						"6"
+					]
+				},
+				"description": "Construção da query\r\nhttp://localhost:5000/api/v2/payments/{id}"
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar transações disponíveis para solicitar antecipação",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{anticipation}}/avaliable-payments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{anticipation}}",
+						"avaliable-payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Solicitar antecipação a partir de uma lista de transações",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[5,6]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{anticipation}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{anticipation}}"
+					]
+				},
+				"description": "Exemplo de corpo para a requisição\r\n```json\r\n[5,6]\r\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Iniciar o atendimento da antecipação",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{anticipation}}/start-analysis/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{anticipation}}",
+						"start-analysis",
+						"1"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "3",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Construção da query\r\nhttp://localhost:5000/api/v2/anticipation/start-analysis/{id}"
+			},
+			"response": []
+		},
+		{
+			"name": "Aprovar uma ou mais transações da antecipação",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[2]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{anticipation}}/2/approve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{anticipation}}",
+						"2",
+						"approve"
+					]
+				},
+				"description": "Construção da query\r\nhttp://localhost:5000/api/v2/anticipation/{id}/approve\r\n\r\nExemplo de body para a requisição\r\n```json\r\n[1,2,5]\r\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Reprovar uma ou mais transações da antecipação",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[5,6]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{anticipation}}/3/reject",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{anticipation}}",
+						"3",
+						"reject"
+					]
+				},
+				"description": "Construção da query\r\nhttp://localhost:5000/api/v2/anticipation/{id}/reject\r\n\r\nExemplo de body para a requisição\r\n```json\r\n[1,2,5]\r\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar histórico de antecipações com filtro por status (todas)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{anticipation}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{anticipation}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar histórico de antecipações com filtro por status (pendentes)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{anticipation}}?status=pending",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{anticipation}}"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "pending"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar histórico de antecipações com filtro por status (em análise)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{anticipation}}?status=analyzing",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{anticipation}}"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "analyzing"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar histórico de antecipações com filtro por status (finalizadas)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/{{url}}/{{anticipation}}?status=finished",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"{{url}}",
+						"{{anticipation}}"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "finished"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "2ebf30fe-f647-44f4-9660-152775a65815",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "aa735fc2-71de-4af6-aae9-ce7de4216521",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "2f8b72c8-cf0c-4d02-b456-a103414a7db4",
+			"key": "url",
+			"value": "api/v2"
+		},
+		{
+			"id": "bd80bcc9-4005-45cf-8d37-755072387b7b",
+			"key": "anticipation",
+			"value": "anticipation"
+		},
+		{
+			"id": "f9ad07fb-7534-4e78-8f2e-7f06ba50e583",
+			"key": "payments",
+			"value": "payments"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
