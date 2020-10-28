@@ -137,7 +137,7 @@ namespace payment_api.Models.Service
             var entity = await Get(id);
 
             if (entity == null)
-                return _resultService.GenerateFailedResult($"No solicitation found for id = ${id}");
+                return _resultService.GenerateFailedResult($"No solicitation found for id = {id}");
 
             if (entity.Analysis.EndDate != null)
                 return _resultService.GenerateFailedResult("Antecipation request is already closed.");

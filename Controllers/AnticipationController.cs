@@ -52,6 +52,14 @@ namespace payment_api.Controllers
         {
             var result = await _anticipationDbService.StartAnalysis(id, DateTime.Now);
 
+            if (!result.Success)
+            {
+                if (result.UnprocessableEntity)
+                    return UnprocessableEntity(result.ErrorMessage);
+
+                return NotFound(result.ErrorMessage);
+            }
+
             return Ok(result);
         }
 
