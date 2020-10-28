@@ -10,8 +10,8 @@ using payment_api.Infrastructure.Database;
 namespace payment_api.Migrations.Server
 {
     [DbContext(typeof(ServerDbContext))]
-    [Migration("20201027021114_StableV1")]
-    partial class StableV1
+    [Migration("20201028002058_StableV2")]
+    partial class StableV2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

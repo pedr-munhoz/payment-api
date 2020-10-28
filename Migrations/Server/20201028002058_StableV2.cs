@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace payment_api.Migrations.Server
 {
-    public partial class StableV1 : Migration
+    public partial class StableV2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
