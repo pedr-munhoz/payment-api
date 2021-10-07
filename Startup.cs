@@ -1,3 +1,4 @@
+using IMDB.Movies.API.Configurations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,8 @@ namespace payment_api
             services.TryAddSingleton<IResultService, ResultService>();
 
             services.AddControllers();
+
+            services.AddSwaggerConfiguration();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +50,8 @@ namespace payment_api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwaggerConfiguration();
 
             app.UseHttpsRedirection();
 
