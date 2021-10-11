@@ -2,7 +2,7 @@
 A financial REST API project using .NET Core, EF Core and PostgreSQL.
 
 ## Assinatura da API
-Para consumir a API, consulte a [documentação](https://github.com/pedr-munhoz/payment-api/blob/master/api-signature.md).
+Para consumir a API, consulte a [documentação](https://github.com/pedr-munhoz/payment-api/blob/master/api-signature.md) ou acesse /index.html com a api rodando.
 
 
 ## Configuração para executar
